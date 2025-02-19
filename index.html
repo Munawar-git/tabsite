@@ -78,6 +78,12 @@
 
     });
 
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+        });
+    }
+
     // function to load HTML from any file to any html element
     function loadHTML(file, targetElement) {
         fetch(file)
@@ -87,6 +93,7 @@
             })
             .catch(error => console.error("Error loading the file:", error));
         closeSidebar();
+        scrollToTop()
     }
 
     document.addEventListener('DOMContentLoaded', function () {

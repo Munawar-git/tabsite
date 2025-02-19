@@ -1,5 +1,5 @@
 <section class="chapter 04" id="04_add_package">
-    <h2>05# Adding Package with IMAGE_INSTALL</h2>
+    <h2>04# Adding Package with IMAGE_INSTALL</h2>
     <div class="video-frame">
         <iframe src="https://www.youtube.com/embed/naszh2WoHAM?si=wW0e9U_P0agxw0d0" title="YouTube video player"
             frameborder="0"
@@ -15,7 +15,7 @@
         This tutorial will guide you through finding, adding, and verifying packages in your Yocto build.
     </p>
 
-    <h3>How to Find Packages</h3>
+    <h3>Looking for a Packages</h3>
     <p>
         To find a package, you first need to set up your build environment. Follow these steps:
     </p>
@@ -31,7 +31,7 @@
 bitbake-layers show-recipes python3
 bitbake-layers show-recipes git</code></pre>
 
-    <h3>How to Add a Package</h3>
+    <h3>Adding a Package</h3>
     <p>
         If the package is available, you can add it to your image by editing the <code>local.conf</code> file. Add the
         following line to include the package:
