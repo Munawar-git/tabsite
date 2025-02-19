@@ -23,6 +23,9 @@ body {
     line-height: 1.6;
 }
 
+hr {
+    margin-block: 2rem;
+}
 /* Typography & Elements */
 pre {
     background-color: var(--code-clr);
