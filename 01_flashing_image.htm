@@ -1,0 +1,152 @@
+<section class="chapter 01" id="01_flashing">
+    <h2>01# Flashing Image on Beaglebone Black</h2>
+    <div class="video-frame">
+        <iframe width="650" height="365" src="https://www.youtube.com/embed/S3NG7ch3Xgw?si=rq_jE5GlDHPop70k"
+            title="YouTube video player" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <p>In this section, we’ll walk you through the process of flashing the Yocto-built image to your BeagleBone
+        Black. By now, you should have a complete flashable image ready, as outlined in the first chapter.
+        Below, we’ll provide a step-by-step guide to help you successfully flash the image onto your BeagleBone
+        Black</p>
+
+    <h3>Image Folder</h3>
+    <p>The image file is located in the following folder:</p>
+    <p><strong>sources/tmp/deploy/images/beaglebone-yocto</strong></p>
+
+    <h3>Identify the Image File</h3>
+    <p>To identify the correct image file, look for a <code>.wic</code> file that starts with the name of your
+        image. In this case, the image is named <strong>core-image-full-cmdline-beaglebone-yocto.wic</strong>.
+    </p>
+    <p>However, note that the file you see might be a symbolic link (symlink). To find the original file,
+        execute the following command from the <code>beaglebone-yocto</code> folder:</p>
+    <pre><code>ll | grep "cmdline" | grep ".wic"</code></pre>
+    <p>This will list all <code>.wic</code> files related to your image. The extension of the original file will
+        also be <code>.wic</code>.</p>
+
+    <h3>Required Hardware</h3>
+    <ul>
+        <li><strong>BeagleBone Black</strong>: <a href="https://grabcad.com/library/beaglebone-black-rev-c-1"
+                target="_blank">BeagleBone Black Rev C</a></li>
+        <li><strong>Micro SD Card</strong>: Minimum 8 GB capacity.</li>
+        <li><strong>SD Card Reader</strong>: To interface the SD card with your host PC.</li>
+        <img src="https://raw.githubusercontent.com/guyz/pyesp8266/master/ftdi_pinout.png"
+            alt="FTDI Cable Pinout">
+        <img src="https://microcontrollerslab.com/wp-content/uploads/2020/12/FTDI-cable-pinout-diagram.jpg"
+            alt="FTDI Cable Diagram">
+        <li><strong>FTDI Cable (Serial to USB)</strong>: For connecting to the serial console.
+        </li>
+        <li><strong>5V Power Supply</strong>: A suitable power adapter for the BeagleBone Black.
+            Example: <a href="https://www.digikey.de/en/products/detail/phihong-usa/PSC12R-050/2384498"
+                target="_blank">Phihong PSC12R-050</a>
+        </li>
+    </ul>
+
+    <h3>Which Flash Tool to Use?</h3>
+    <p>There are two common tools for flashing images onto an SD card:</p>
+
+    <h4><code>dd</code></h4>
+    <ul>
+        <li><strong>Pros</strong>: Fast and efficient.</li>
+        <li><strong>Cons</strong>: Dangerous if used incorrectly, as it can overwrite critical system partitions
+            irreversibly.</li>
+    </ul>
+
+    <h4>Etcher</h4>
+    <ul>
+        <li><strong>Pros</strong>: Safe and user-friendly. Automatically hides system memory devices and shows
+            only external devices.</li>
+        <li><strong>Download</strong>: <a href="https://www.balena.io/etcher" target="_blank">Balena Etcher</a>
+        </li>
+    </ul>
+    <p><strong>We will use Etcher for this process.</strong></p>
+
+    <h3>How to Flash?</h3>
+
+    <h4>Step 1: Install Etcher</h4>
+    <ul>
+        <li>Download Etcher from the official website.</li>
+        <li>Navigate to the download folder.</li>
+        <li>Right-click on the Etcher executable and go to <strong>Properties > Permissions</strong>.</li>
+        <li>Check the box <strong>Allow executing file as a program</strong>.</li>
+        <li>Close the window and double-click on Etcher to launch it.</li>
+    </ul>
+
+    <h4>Step 2: Flash the Image</h4>
+    <ul>
+        <li>Insert the micro SD card into your host PC.</li>
+        <li>In the Etcher window:
+            <ul>
+                <li>Select the SD card.</li>
+                <li>Click <strong>Flash from file</strong> and browse to the <code>.wic</code> image file you
+                    identified earlier.</li>
+            </ul>
+        </li>
+        <li>Click <strong>Flash!</strong> and wait for the process to complete.</li>
+        <li>Once the flashing is done, close Etcher.</li>
+        <li>Safely eject the SD card by clicking the <strong>Unmount</strong> icon.</li>
+    </ul>
+
+    <h3>Install Picocom on Host PC</h3>
+    <p>Picocom is a lightweight terminal emulator needed to connect to the BeagleBone Black's serial console.
+        Install it using the following command:</p>
+    <pre><code>sudo apt-get install picocom</code></pre>
+
+    <h3>Connect the FTDI Cable</h3>
+    <ul>
+        <li>Connect the USB side of the FTDI cable to your host PC.</li>
+        <li>Verify the connection by running:</li>
+    </ul>
+    <pre><code>dmesg | grep ftdi</code></pre>
+    <p>You should see output similar to the following:</p>
+    <pre><code>[14264.312945] usbcore: registered new interface driver ftdi_sio
+[14264.313235] ftdi_sio 1-4.3:1.0: FTDI USB Serial Device converter detected
+[47027.147164] ftdi_sio ttyUSB0: FTDI USB Serial Device converter now disconnected from ttyUSB0
+[47027.147242] ftdi_sio 1-4.3:1.0: device disconnected
+[57870.337870] ftdi_sio 1-4.3:1.0: FTDI USB Serial Device converter detected</code></pre>
+    <p>The FTDI device will appear as <code>/dev/ttyUSB0</code>.</p>
+    <ul>
+        <li>Connect the other end of the FTDI cable to the BeagleBone Black.</li>
+        <li>Orientation: Place the board so that the USB port faces you. Insert the pin header such that the
+            green pin of the FTDI cable connects to the pin closest to the USB port.</li>
+        <li>Open a terminal and run the following command to connect to the BeagleBone Black:</li>
+    </ul>
+    <pre><code>sudo picocom /dev/ttyUSB0 -b 115200</code></pre>
+    <p>Enter your password when prompted.</p>
+
+    <h3>Booting the BeagleBone Black</h3>
+    <ul>
+        <li>Insert the flashed SD card into the SD card slot on the back of the BeagleBone Black.</li>
+        <li>Locate the small button labeled <strong>S2</strong>, which is adjacent to the USB port.</li>
+        <li>Press and hold the <strong>S2</strong> button while inserting the power supply into the BeagleBone
+            Black.</li>
+        <li>Release the <strong>S2</strong> button after 2–3 seconds.</li>
+        <li>You should now see output on your Picocom terminal, indicating that the BeagleBone Black has booted
+            successfully.</li>
+    </ul>
+
+    <h3>Verifying the Image</h3>
+
+    <h4>Check Kernel Version</h4>
+    <p>Run the following commands to verify the kernel version:</p>
+    <pre><code>uname -r
+uname -a</code></pre>
+
+    <h4>View Disk Partitions</h4>
+    <p>List the disk partitions to ensure the image is properly loaded:</p>
+    <pre><code>lsblk</code></pre>
+
+    <h4>Explore Root Filesystem</h4>
+    <p>Navigate to the root directory and list its contents:</p>
+    <pre><code>cd /
+ls</code></pre>
+
+    <h3>Conclusion</h3>
+    <p>In this chapter, we learned how to flash the BeagleBone Black using the Etcher tool, connect to its
+        serial console using Picocom, and boot the device. We also verified the flashed image by checking the
+        kernel version and exploring the filesystem.</p>
+    <p>In the next chapter, we will delve into the details of the <code>local.conf</code> file and its role in
+        configuring the Yocto build environment.</p>
+
+</section>

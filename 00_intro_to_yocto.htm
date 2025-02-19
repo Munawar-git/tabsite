@@ -1,0 +1,161 @@
+<section class="chapter 00" id="00_introduction">
+    <h2>00# Introduction to Yocto</h2>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/5fj05BWryhM?si=PiXr17we-uveIdMb"
+            title="YouTube video player" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h3>What is Yocto?</h3>
+    <p>The <strong>Yocto Project</strong> is not an embedded Linux distribution—it creates a custom one for
+        you. It provides tools, metadata, and documentation to help developers create their own Linux-based
+        systems tailored to specific hardware platforms.</p>
+    <p><a href="https://www.yoctoproject.org/" target="_blank">Learn more about the Yocto Project</a></p>
+
+    <h3>Why Use Yocto?</h3>
+    <ul>
+        <li>To configure Linux according to your specifications.</li>
+        <li>The image contains only what you need—no extra packages.</li>
+        <li>Small image size, ideal for resource-constrained devices.</li>
+    </ul>
+
+    <h3>What is the Workflow?</h3>
+    <p>For now, we won’t delve into the details of the workflow. In later chapter we will learn it in great
+        detail. You can also explore the general overview in the following link.</p>
+    <p><a href="https://www.yoctoproject.org/development/technical-overview/" target="_blank">Overview of the
+            Yocto
+            Software Workflow</a></p>
+
+    <h3>Host PC Requirements</h3>
+    <ul>
+        <li>Minimum 50 GB free space</li>
+        <li>Minimum 4 GB RAM</li>
+    </ul>
+
+    <h4>Supported Linux Distributions</h4>
+    <ul>
+        <li>Ubuntu 18.04 (LTS)</li>
+        <li>Ubuntu 20.04 (LTS)</li>
+        <li>Ubuntu 22.04 (LTS)</li>
+        <li>Fedora 34</li>
+        <li>Fedora 35</li>
+        <li>AlmaLinux 8.5</li>
+        <li>Debian GNU/Linux 10.x (Buster)</li>
+        <li>Debian GNU/Linux 11.x (Bullseye)</li>
+        <li>OpenSUSE Leap 15.3</li>
+    </ul>
+    <p><strong>Note:</strong> This tutorial uses <strong>Ubuntu 18.04 (LTS)</strong>.</p>
+
+    <h3>Target Hardware</h3>
+    <p>We will be using the <strong>BeagleBone Black</strong> as our target hardware platform.</p>
+
+    <h4>Key Features of BeagleBone Black</h4>
+    <ul>
+        <li>512 MB DDR3 RAM</li>
+        <li>4 GB eMMC</li>
+        <li>SD card slot</li>
+        <li>HDMI</li>
+        <li>GPIOs, UARTs, SPI, I²C, Ethernet, USB, etc.</li>
+    </ul>
+    <p>For detailed specifications, refer to the official BeagleBone Black documentation: <a
+            href="https://beagleboard.org/black" target="_blank">BeagleBone Black Specifications</a>.</p>
+
+    <h4>Pinout Diagram</h4>
+    <p><img src="https://vadl.github.io/images/bbb/bbb_headers.png" alt="BeagleBone Black Pinout"></p>
+
+    <h3>Setting Up the Host PC</h3>
+
+    <h4>Installing an Editor</h4>
+    <p>We recommend using <strong>VSCode</strong> as the editor for this tutorial. To install VSCode via the
+        command line:</p>
+    <pre><code>
+sudo apt update
+sudo apt install snapd
+sudo snap install --classic code
+        </code></pre>
+
+    <h4>Installing Required Packages</h4>
+    <p>Before proceeding, ensure the necessary packages are installed on your host system:</p>
+    <pre><code>
+sudo apt install gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm python3-subunit mesa-common-dev zstd liblz4-tool
+</code></pre>
+    <p><em>Reference:</em> <a
+            href="https://docs.yoctoproject.org/4.0.7/brief-yoctoprojectqs/index.html#build-host-packages"
+            target="_blank">Build Host Packages</a></p>
+
+    <h3>Building an Image</h3>
+
+    <h4>What is Poky?</h4>
+    <p>Poky is a reference distribution provided by the Yocto Project. It includes the OpenEmbedded Build
+        System (BitBake and OpenEmbedded Core) along with metadata to help you get started building your own
+        distribution.</p>
+
+    <h4>Cloning Poky</h4>
+    <p>Create a project folder and clone the Poky repository:</p>
+    <pre><code>
+mkdir yocto_tutorial
+cd yocto_tutorial
+git clone git://git.yoctoproject.org/poky -b kirkstone
+</code></pre>
+
+    <h4>Initializing the Build Environment</h4>
+    <p>Navigate into the cloned Poky directory and initialize the build environment:</p>
+    <pre><code>
+cd poky
+source oe-init-build-env
+</code></pre>
+    <p>This command places you in the <code>build</code> folder, where the configuration files reside. For
+        now, focus on the <code>conf</code> folder, which contains critical configuration files.</p>
+
+    <h4>Creating a Source Folder (Optional but Recommended)</h4>
+    <p>From the <code>build</code> folder, create a centralized source folder for organizing your projects:
+    </p>
+    <pre><code>
+mkdir ../../sources
+</code></pre>
+
+    <h4>Configuring <code>local.conf</code></h4>
+    <p>Modify the <code>local.conf</code> file in the <code>conf</code> folder to suit your needs:</p>
+    <ul>
+        <li>Set the machine type (e.g., <code>beaglebone-yocto</code>).</li>
+        <li>Define the source path.</li>
+        <li>Add the following settings:</li>
+    </ul>
+    <pre><code>
+DL_DIR = "PATH/TO/sources/downloads"
+SSTATE_DIR = "PATH/TO/sources/sstate_cache"
+TMPDIR = "PATH/TO/sources/tmp"
+MACHINE="beaglebone-yocto"
+RM_OLD_IMAGE = "1"
+INHERIT += "rm_work"
+</code></pre>
+    <p>We’ll discuss the contents of the <code>local.conf</code> file in detail in a separate chapter.</p>
+
+    <h4>Building the Image</h4>
+    <p>Execute the following command on your terminal to build the image:</p>
+    <pre><code>
+bitbake core-image-full-cmdline
+</code></pre>
+    <p>This process may take some time, depending on your system’s specifications and internet connection
+        speed. On subsequent builds, only the changed components will be rebuilt, significantly reducing
+        build times.</p>
+
+    <h3>Locating the Image File</h3>
+    <p>Once the build is complete, navigate to the <code>tmp</code> folder to locate the generated image
+        file:</p>
+    <pre><code>
+cd ../../sources/tmp/deploy/images/beaglebone-yocto
+</code></pre>
+    <p>Here, you’ll find the final image file:</p>
+    <ul>
+        <li><strong>Image Name:</strong> <code>core-image-full-cmdline-beaglebone-yocto.wic</code></li>
+    </ul>
+
+    <h3>Conclusion</h3>
+    <p>In this chapter, we introduced the Yocto Project, its purpose, and why it’s beneficial for embedded
+        Linux development. We also covered the setup of the host PC, cloned the Poky repository, initialized
+        the build environment, and built a basic image for the BeagleBone Black.</p>
+    <p>In the next chapter, we’ll explore how to flash the image onto the BeagleBone Black and boot it. Stay
+        tuned!</p>
+
+</section>

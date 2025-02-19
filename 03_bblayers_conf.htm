@@ -1,0 +1,80 @@
+<section class="chapter 03" id="03_bblayer_conf">
+    <h2>03# Understanding bblayer.conf File</h2>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/GyLRWAe-b7k?si=m8-b094Z5n59ktD4" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
+    <h3>What is <code>bblayers.conf</code>?</h3>
+    <p>The <code>bblayers.conf</code> file is a configuration file used by the Yocto Project build system. It
+        defines the set of layers that should be included in a build and specifies their locations on the local file
+        system.</p>
+    <ul>
+        <li>It lists the layers to include in the build.</li>
+        <li>Each layer contains metadata such as recipes, configuration files, and other data required for building
+            and customizing an image.</li>
+    </ul>
+
+    <h3>What is a Layer?</h3>
+    <p>A <strong>layer</strong> is a collection of related metadata that provides configuration information
+        necessary for building and customizing images. Layers typically contain:</p>
+    <ul>
+        <li>Recipes</li>
+        <li>Configuration files</li>
+        <li>Additional data required for the build process</li>
+    </ul>
+    <p>Layer names usually start with <strong><code>meta</code></strong>. Examples include:</p>
+    <ul>
+        <li><code>meta</code>: The core layer provided by the Yocto Project.</li>
+        <li><code>meta-poky</code>: Contains the Poky reference distribution.</li>
+        <li><code>meta-yocto-bsp</code>: Provides board support packages (BSPs) for specific hardware platforms.
+        </li>
+    </ul>
+
+    <h3>What is a Recipe?</h3>
+    <p>A <strong>recipe</strong> is a set of instructions for building software packages. It describes:</p>
+    <ul>
+        <li>Where to obtain the source code.</li>
+        <li>Which patches to apply.</li>
+        <li>How to configure and compile the source.</li>
+        <li>Dependencies on libraries or other recipes.</li>
+    </ul>
+    <p>For example:</p>
+    <p><code>meta/recipes-extended/minicom/minicom_2.8.bb</code>: This recipe builds the Minicom terminal emulator.
+    </p>
+    <p>We will explore recipes in greater detail in a later chapter.</p>
+
+    <h3>BitBake Basic Layer Commands</h3>
+
+    <h4>Show Layers in <code>bblayers.conf</code></h4>
+    <p>To list all layers currently included in the build:</p>
+    <pre><code>bitbake-layers show-layers</code></pre>
+
+    <h4>Add a Layer to <code>bblayers.conf</code></h4>
+    <p>To add a new layer to the build configuration:</p>
+    <pre><code>bitbake-layers add-layer &lt;path/to/layer&gt;</code></pre>
+
+    <h4>Remove a Layer from <code>bblayers.conf</code></h4>
+    <p>To remove a layer from the build configuration:</p>
+    <pre><code>bitbake-layers remove-layer &lt;path/to/layer&gt;</code></pre>
+
+    <h3>Reference Link</h3>
+    <p>For more details on Yocto variables and configurations, refer to the official documentation:</p>
+    <p><a href="https://docs.yoctoproject.org/ref-manual/variables.html" target="_blank">Yocto Variables
+            Documentation</a></p>
+
+    <h3>Conclusion</h3>
+    <p>In this chapter, we explored the <code>bblayers.conf</code> file, its role in the Yocto Project build system, and
+        how it helps manage layers. We learned:</p>
+    <ul>
+        <li>What a <strong>layer</strong> is and how it organizes metadata for building and customizing images.</li>
+        <li>The concept of a <strong>recipe</strong>, which provides instructions for building software packages.</li>
+        <li>Essential <strong>BitBake commands</strong> for adding, removing, and listing layers.</li>
+    </ul>
+    <p>Understanding <code>bblayers.conf</code> is fundamental to working with the Yocto Project, as it allows you to
+        include and manage the layers that define your build environment. In the next video, we will dive deeper into
+        how to add custom packages to your image, further expanding your control over the build process.</p>
+    <p>Stay tuned!</p>
+</section>

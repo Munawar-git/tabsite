@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="tab-wm.png">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div id="tab-icon"><a href="#home"><img  src="tab.jpg" alt="tech-a-byte-img"></a></div>
+        <h2>Topics</h2>
+        <ul>
+            <li id="00"><a href="#00_introduction">00# Introduction to Yocto</a></li>
+            <li id="01"><a href="#01_flashing">01# Flashing Image on BeagleBone Black</a></li>
+            <li id="02"><a href="#02_local_conf">02# Understanding local.conf</a></li>
+            <li id="03"><a href="#03_bblayer_conf">03# Understanding bblayers.conf</a></li>
+        </ul>
+    </div>
+
+    <!-- Sidebar Toggle Button -->
+    <button id="sidebar-toggle" class="toggle-button">&#x00bb;</button>
+
+    <!-- Main Content -->
+    <div class="main-content" id="home">
+        <header>
+            <h1>Tech-A-Byte</h1>
+            <h2>Yocto Tutorial Series</h2>
+        </header>
+
+        <div id="content_area">
+            <section class="chapter about">
+                <h2>About the Website</h2>
+
+                <p>This website is dedicated to providing in-depth tutorials and resources on the <strong>Yocto
+                        Project</strong>, guiding developers from beginner to advanced levels. Whether you are just
+                    starting
+                    with embedded Linux development or looking to master <strong>custom Linux distributions using
+                        Yocto</strong>, this platform offers a structured learning path with <strong>practical examples,
+                        step-by-step guides, and real-world use cases</strong>.</p>
+                <p>In addition to written tutorials, you can also find video explanations on my <strong>YouTube
+                        channel,<a href="http://www.youtube.com/@techabyte8"> Tech-A-Byte</a></strong>, where
+                    I demonstrate Yocto concepts with hands-on examples. These videos complement the website tutorials,
+                    making it
+                    easier to grasp complex topics visually.</p>
+                <h3>Mission & Vision</h3>
+
+                <p>The mission of this website is to <strong>simplify embedded Linux development</strong> and help
+                    developers build robust and efficient <strong>custom Linux distributions</strong> using the
+                    <strong>Yocto Project</strong>. The platform aims to:
+                </p>
+                <ul>
+                    <li><strong>Educate</strong> engineers, developers, and hobbyists on the core concepts of Yocto.
+                    </li>
+                    <li><strong>Bridge the knowledge gap</strong> by offering structured, easy-to-follow tutorials.</li>
+                    <li><strong>Provide real-world examples</strong> to help developers implement Yocto in their
+                        projects.
+                    </li>
+                    <li><strong>Keep the community updated</strong> with the latest Yocto features, best practices, and
+                        troubleshooting techniques.</li>
+                </ul>
+
+                <h3>What You Will Learn</h3>
+
+                <p>The website covers a wide range of topics, including:</p>
+                <div class="highlight">
+                    <ul>
+                        <li><strong>Introduction to the Yocto Project</strong> – Understanding its purpose,
+                            architecture,
+                            and benefits.</li>
+                        <li><strong>Building Your First Image</strong> – Step-by-step instructions to create a simple
+                            Linux image.</li>
+                        <li><strong>BitBake & Recipes</strong> – Deep dive into the BitBake build system and writing
+                            custom recipes.</li>
+                        <li><strong>Creating Custom Layers</strong> – Understanding and structuring layers for modular
+                            Yocto builds.</li>
+                        <li><strong>Modifying & Customizing Images</strong> – Adding or removing packages, tweaking
+                            configurations.</li>
+                        <li><strong>Kernel & Driver Development</strong> – Patching and configuring the Linux kernel
+                            within Yocto.</li>
+                        <li><strong>Optimizing Build Performance</strong> – Techniques to reduce build times and
+                            manage
+                            dependencies.</li>
+                        <li><strong>Debugging & Troubleshooting</strong> – Fixing common issues and optimizing Yocto
+                            builds.</li>
+                        <li><strong>Advanced Yocto Concepts</strong> – Distro features, SDKs, multiconfig builds, and
+                            real-world applications.</li>
+                    </ul>
+                </div>
+
+                <h3>Who Should Use This Website?</h3>
+
+                <p>This website is ideal for:</p>
+                <ul>
+                    <li> <strong>Embedded Software Engineers</strong> looking to streamline their development process.
+                    </li>
+                    <li> <strong>Linux Enthusiasts & Hobbyists</strong> interested in learning about custom Linux
+                        builds.
+                    </li>
+                    <li> <strong>System Integrators</strong> who need a flexible, scalable solution for their embedded
+                        projects.</li>
+                    <li> <strong>Students & Researchers</strong> exploring embedded Linux for academic and industrial
+                        projects.</li>
+                </ul>
+
+                <h3>Why This Website?</h3>
+
+                <p>Unlike scattered documentation and fragmented tutorials, this website offers a <strong>structured
+                        learning path</strong> with <strong>clear explanations, hands-on examples, and up-to-date
+                        information</strong>. With a focus on <strong>real-world applications</strong>, developers can
+                    quickly go from theory to <strong>building their own Yocto-based projects</strong> with confidence.
+                </p>
+
+            </section>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
+
+
+
+<script>
+    // Sidebar Toggle Functionality
+    function closeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        if (sidebar.style.left === '0px') {
+            sidebar.style.left = '-250px'; // Hide sidebar
+            sidebarToggle.style.left = '-10px';
+            sidebarToggle.innerHTML = '&#x00bb;'
+        }
+    }
+
+    // Toggke Sidebar function
+    document.getElementById('sidebar-toggle').addEventListener('click', function () {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        if (sidebar.style.left === '0px') {
+            sidebar.style.left = '-250px'; // Hide sidebar
+            sidebarToggle.style.left = '-10px';
+            sidebarToggle.innerHTML = '&#x00bb;'
+        } else {
+            sidebar.style.left = '0px'; // Show sidebar
+            sidebarToggle.style.left = '225px'; // Show sidebar
+            sidebarToggle.innerHTML = '&#x00ab;'
+        }
+
+    });
+
+    // Close Sidebar when click anywhere on main screen
+    document.getElementById('home').addEventListener('click', function () {
+        closeSidebar();
+
+    });
+
+    // function to load HTML from any file to any html element
+    function loadHTML(file, targetElement) {
+        fetch(file)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById(targetElement).innerHTML = html;
+            })
+            .catch(error => console.error("Error loading the file:", error));
+        closeSidebar();
+    }
+
+    // Loading HTML on click on topic
+    document.getElementById("tab-icon").addEventListener("click", function () {
+        loadHTML("about_page.htm", "content_area");
+    });
+    document.getElementById("00").addEventListener("click", function () {
+        loadHTML("00_intro_to_yocto.htm", "content_area");
+    });
+    document.getElementById("01").addEventListener("click", function () {
+        loadHTML("01_flashing_image.htm", "content_area");
+    });
+    document.getElementById("02").addEventListener("click", function () {
+        loadHTML("02_local_conf.htm", "content_area");
+    });
+    document.getElementById("03").addEventListener("click", function () {
+        loadHTML("03_bblayers_conf.htm", "content_area");
+    });
+
+</script>
+</body>
+
+</html>

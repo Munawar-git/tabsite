@@ -1,0 +1,185 @@
+<section class="chapter 02" id="02_local_conf">
+    <h2>02# Understanding local.conf</h2>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/CQw02-PMNrA?si=ixbgFJgconaqG3eL"
+            title="YouTube video player" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <p>In this tutorial, we will take a comprehensive look at the local.conf file, a crucial configuration file in the
+        Yocto Project. We will explore some basic yet important variables, configure settings for our machine, establish
+        the source folder, and learn techniques to reduce disk usage during the build process.</p>
+    <h3>What is local.conf?</h3>
+    <p>
+        The <code>local.conf</code> file is used to customize the Yocto build process. It allows you to:
+    </p>
+    <ul>
+        <li>Customize the image.</li>
+        <li>Add or remove packages.</li>
+    </ul>
+
+    <h3>Default Configurations in local.conf</h3>
+    <p>
+        The <code>local.conf</code> file contains several default configurations, including:
+    </p>
+    <ul>
+        <li><code>MACHINE ?= "beaglebone-yocto"</code></li>
+        <li><code>DL_DIR</code>, <code>SSTATE_DIR</code>, <code>TMPDIR</code></li>
+        <li><code>DISTRO ?= "poky"</code></li>
+        <li><code>PACKAGE_CLASSES ?= "package_rpm"</code></li>
+        <li><code>EXTRA_IMAGE_FEATURES ?= "debug-tweaks"</code></li>
+        <li><code>USER_CLASSES ?= "buildstats"</code></li>
+        <li><code>PATCHRESOLVE = "noop"</code></li>
+        <li><code>BB_DISKMON_DIRS</code></li>
+        <li><code>CONF_VERSION = "2"</code></li>
+    </ul>
+
+    <h3>Added Configurations</h3>
+    <p>
+        Additional configurations can be added to <code>local.conf</code>, such as:
+    </p>
+    <ul>
+        <li><code>RM_OLD_IMAGE = "1"</code></li>
+        <li><code>INHERIT += "rm_work"</code></li>
+    </ul>
+
+    <h3>Configuration Details</h3>
+
+    <h4>MACHINE</h4>
+    <p>
+        The <code>MACHINE</code> variable specifies the target device for which the image is built.
+    </p>
+    <p>List of Default Machines:</p>
+    <ul>
+        <li><code>MACHINE ?= "qemuarm"</code></li>
+        <li><code>MACHINE ?= "qemuarm64"</code></li>
+        <li><code>MACHINE ?= "qemumips"</code></li>
+        <li><code>MACHINE ?= "qemumips64"</code></li>
+        <li><code>MACHINE ?= "qemuppc"</code></li>
+        <li><code>MACHINE ?= "qemux86"</code></li>
+        <li><code>MACHINE ?= "qemux86-64"</code></li>
+        <li><code>MACHINE ?= "genericx86"</code></li>
+        <li><code>MACHINE ?= "genericx86-64"</code></li>
+        <li><code>MACHINE ?= "beaglebone-yocto"</code></li>
+        <li><code>MACHINE ?= "edgerouter"</code></li>
+    </ul>
+    <p>
+        Default machine configuration files are located in:
+    </p>
+    <ul>
+        <li><code>poky/meta/conf/machines</code></li>
+        <li><code>poky/meta-yocto-bsp</code></li>
+    </ul>
+
+    <h4>DL_DIR</h4>
+    <p>
+        The <code>DL_DIR</code> variable specifies the directory where source code archives for packages are
+        downloaded. This avoids re-downloading the same files in subsequent builds.
+    </p>
+
+    <h4>SSTATE_DIR</h4>
+    <p>
+        The <code>SSTATE_DIR</code> variable specifies the directory for shared state cache files. These files
+        store pre-built binaries to speed up the build process by avoiding redundant builds.
+    </p>
+
+    <h4>TMPDIR</h4>
+    <p>
+        The <code>TMPDIR</code> variable specifies the directory for temporary files during the build process.
+        It is used to store build artifacts.
+    </p>
+
+    <h4>DISTRO</h4>
+    <p>
+        The <code>DISTRO</code> variable specifies the distribution being built. For example:
+    </p>
+    <ul>
+        <li><code>DISTRO ?= "poky"</code> uses the reference distribution configuration.</li>
+    </ul>
+
+    <h4>PACKAGE_CLASSES</h4>
+    <p>
+        The <code>PACKAGE_CLASSES</code> variable specifies the package format for the target system. For
+        example:
+    </p>
+    <ul>
+        <li><code>PACKAGE_CLASSES ?= "package_rpm"</code> creates RPM packages.</li>
+        <li>DEB packages are used for Debian and Ubuntu systems.</li>
+    </ul>
+
+    <h4>EXTRA_IMAGE_FEATURES</h4>
+    <p>
+        The <code>EXTRA_IMAGE_FEATURES</code> variable adds features to the target image. For example:
+    </p>
+    <ul>
+        <li><code>EXTRA_IMAGE_FEATURES ?= "debug-tweaks"</code> enables debugging tools and root login without a
+            password.</li>
+        <li><code>dbg-pkgs</code> adds debugging symbols.</li>
+        <li><code>read-only-rootfs</code> creates a read-only root filesystem.</li>
+        <li><code>tools-debug</code> adds debugging tools like <code>gdb</code> and <code>strace</code>.</li>
+        <li><code>tools-sdk</code> adds development tools like <code>gcc</code> and <code>make</code>.</li>
+    </ul>
+
+    <h4>USER_CLASSES</h4>
+    <p>
+        The <code>USER_CLASSES</code> variable specifies user-defined classes. For example:
+    </p>
+    <ul>
+        <li><code>USER_CLASSES ?= "buildstats"</code> records performance statistics for each task during the
+            build.</li>
+    </ul>
+
+    <h4>PATCHRESOLVE</h4>
+    <p>
+        The <code>PATCHRESOLVE</code> variable determines the action to take when a patch fails. For example:
+    </p>
+    <ul>
+        <li><code>PATCHRESOLVE = "noop"</code> causes the build to fail.</li>
+        <li><code>PATCHRESOLVE = "user"</code> allows manual resolution of conflicts.</li>
+    </ul>
+
+    <h4>BB_DISKMON_DIRS</h4>
+    <p>
+        The <code>BB_DISKMON_DIRS</code> variable monitors disk space and inodes during the build. For example:
+    </p>
+    <ul>
+        <li><code>STOPTASKS,${TMPDIR},1G,100K</code> stops the build if disk space drops below 1 GB.</li>
+        <li><code>HALT,${TMPDIR},100M,1K</code> halts the build immediately if disk space drops below 100 MB.
+        </li>
+    </ul>
+
+    <h4>CONF_VERSION</h4>
+    <p>
+        The <code>CONF_VERSION</code> variable specifies the configuration syntax version. For example:
+    </p>
+    <ul>
+        <li><code>CONF_VERSION = "2"</code> enables newer Yocto features.</li>
+    </ul>
+
+    <h4>RM_OLD_IMAGE</h4>
+    <p>
+        The <code>RM_OLD_IMAGE</code> variable removes old images before building new ones. For example:
+    </p>
+    <ul>
+        <li><code>RM_OLD_IMAGE = "1"</code> deletes old images to free up space.</li>
+    </ul>
+
+    <h4>INHERIT</h4>
+    <p>
+        The <code>INHERIT</code> variable adds classes to the build process. For example:
+    </p>
+    <ul>
+        <li><code>INHERIT += "rm_work"</code> removes temporary files after a package is built.</li>
+    </ul>
+
+    <h3>Reference Link</h3>
+    <p>
+        For more details, refer to the official Yocto documentation:
+        <a href="https://docs.yoctoproject.org/ref-manual/variables.html#">Yocto Variables Reference</a>.
+    </p>
+
+    <h3>Conclusion</h3>
+    <p>
+        In this tutorial, you got the solid understanding of the local.conf file and its key variables. You also know how to configure your machine, manage source files, and optimize disk usage during builds.
+    </p>
+</section>
