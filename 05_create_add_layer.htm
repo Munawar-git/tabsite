@@ -1,0 +1,101 @@
+<section class="chapter 05" id="04_create_add_layer">
+    <h2>05# Create & Add Layer</h2>
+    <div class="video-frame">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/-atEGK1DzIQ?si=Ej3k0mwdmXqPSotc"
+            title="YouTube video player" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
+    <p>In this tutorial, you will learn about Yocto layers, their purpose, and how to create and manage them. Layers play a crucial role in organizing and modularizing a Yocto-based build system.</p>
+  <h3>What is a Layer?</h3>
+  <p>
+    In the Yocto Project, a <strong>layer</strong> is a collection of metadata (recipes, configurations, and instructions) that defines how to build software components for your target system. Layers allow you to:
+  </p>
+  <ul>
+    <li>Organize and modularize your build configuration.</li>
+    <li>Reuse existing configurations (e.g., for hardware or software packages).</li>
+    <li>Add custom functionality without modifying core Yocto files.</li>
+  </ul>
+  <p>
+    A typical layer contains:
+  </p>
+  <ul>
+    <li><strong>Recipes</strong>: Instructions to build packages (<code>.bb</code> files).</li>
+    <li><strong>Machine configurations</strong>: Settings for specific hardware (e.g., BeagleBone Black).</li>
+    <li><strong>Distro configurations</strong>: Customizations for Linux distributions (e.g., <code>poky</code>).</li>
+  </ul>
+
+  <h3>What is Layer Priority?</h3>
+  <p>
+    Layer priority determines which layer's recipes take precedence when multiple layers contain recipes with the same name. A <strong>higher numeric priority value</strong> means the layer's recipes will override those in lower-priority layers.
+  </p>
+  <p>
+    <em>Example:</em> If both <code>meta-layerA</code> (priority 5) and <code>meta-layerB</code> (priority 3) have a <code>python3_1.0.bb</code> recipe, the build system will use the recipe from <code>meta-layerA</code>.
+  </p>
+
+  <h4>How to Check Layer Priority</h4>
+  <p>
+    Use the <code>bitbake-layers</code> command to list all active layers and their priorities:
+  </p>
+  <pre><code>bitbake-layers show-layers</code></pre>
+  <p>
+    Example output:
+  </p>
+  <pre>
+    layer                 path                                      priority
+    ==========================================================================
+    meta                  /home/munawar/YoctoTuitorial/poky/meta    5
+    meta-poky             /home/munawar/YoctoTuitorial/poky/meta-poky  5
+    meta-yocto-bsp        /home/munawar/YoctoTuitorial/poky/meta-yocto-bsp  5
+    meta-oe               /home/munawar/YoctoTuitorial/poky/meta-openembedded/meta-oe  5
+    meta-python           /home/munawar/YoctoTuitorial/poky/meta-openembedded/meta-python  5</pre>
+
+  <h3>How to Create a Layer</h3>
+  <p>
+    Use the <code>bitbake-layers create-layer</code> command to generate a new layer template:
+  </p>
+  <pre><code>bitbake-layers create-layer &lt;path/to/meta-layername&gt;</code></pre>
+  <p>
+    <em>Example:</em>
+  </p>
+  <pre><code>bitbake-layers create-layer ../meta-tab-layer</code></pre>
+  <p>
+    This creates:
+  </p>
+  <ul>
+    <li>A layer directory (e.g., <code>meta-tab-layer</code>).</li>
+    <li>A default <code>conf/layer.conf</code> file.</li>
+    <li>A <code>README</code> file and placeholder directories (<code>recipes-*</code>).</li>
+  </ul>
+
+  <h4>Add the Layer to the Build System</h4>
+  <p>
+    Activate the layer in your build configuration using:
+  </p>
+  <pre><code>bitbake-layers add-layer &lt;path/to/meta-layername&gt;</code></pre>
+  <p>
+    <em>Example:</em>
+  </p>
+  <pre><code>bitbake-layers add-layer ../meta-tab-layer</code></pre>
+  <p>
+    This updates the <code>conf/bblayers.conf</code> file to include the new layer.
+  </p>
+
+  <h3>Best Practices for Layers</h3>
+  <ul>
+    <li>Use the <code>meta-</code> prefix for layer names (e.g., <code>meta-tab-layer</code>).</li>
+    <li>Store layers outside the <code>poky</code> directory to avoid conflicts during updates.</li>
+    <li>Use version control (e.g., Git) to manage layer changes.</li>
+  </ul>
+
+  <h3>Conclusion</h3>
+  <p>In this tutorial, we explored the concept of layers in the Yocto Project and their role in organizing and modularizing a build system. We discussed how layers contain metadata, recipes, and configurations that guide the OpenEmbedded build system. Understanding layer priority is crucial, as it determines which recipe takes precedence when multiple layers contain the same package. We also learned how to check the existing layers in a build system and examined the process of creating a custom layer and integrating it into Yocto. By mastering these fundamentals, you can effectively structure and manage your Yocto-based projects, ensuring flexibility and maintainability in embedded Linux development.</p>
+
+  <h3>Reference Links</h3>
+  <ul>
+    <li><a href="https://docs.yoctoproject.org/dev/overview-manual/yp-intro.html#the-yocto-project-layer-model">Yocto Layer Model Overview</a></li>
+    <li><a href="https://docs.yoctoproject.org/dev/dev-manual/layers.html#creating-your-own-layer">Official Guide: Creating Custom Layers</a></li>
+  </ul>
+
+</section>
