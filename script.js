@@ -79,6 +79,6 @@ document.getElementById("06").addEventListener("click", function () {
     loadHTML("06_basic_vars.htm", "content_area");
 });
 
-;document.getElementById("07").addEventListener("click", function () {
+document.getElementById("07").addEventListener("click", function () {
     loadHTML("07_var_assign_operator.htm", "content_area");
 });
