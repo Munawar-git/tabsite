@@ -73,4 +73,7 @@ document.getElementById("04").addEventListener("click", function () {
 });
 document.getElementById("05").addEventListener("click", function () {
     loadHTML("05_create_add_layer.htm", "content_area");
+
+});document.getElementById("06").addEventListener("click", function () {
+    loadHTML("06_basic_vars.htm", "content_area");
 });

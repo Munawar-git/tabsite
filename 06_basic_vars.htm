@@ -1,0 +1,127 @@
+<section class="chapter 06" id="05_basic_vars">
+    <h2>06# Understanding Yocto Basic Variables</h2>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/g3Xfckd-mE8?si=1sb41qHPZRLbDnon" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <p>
+        Variables are the backbone of the Yocto build system, defining how recipes are processed, how packages are
+        built, and where files are stored. In this tutorial, we’ll explore some of the most commonly used default
+        variables in Yocto, their purposes, and how to work with them effectively.
+    </p>
+
+    <h3>What You Will Learn</h3>
+    <p>
+        In this tutorial, we’ll cover the following:
+    </p>
+    <ul>
+        <li>Key default variables used in the Yocto build system.</li>
+        <li>How to read and interpret variable values.</li>
+        <li>The structure of recipe filenames and their relationship to variables.</li>
+    </ul>
+
+    <h3>Basic Variables</h3>
+    <p>
+        The Yocto build system uses several default variables to manage the build process. Here are the most important
+        ones:
+    </p>
+    <ul>
+        <li><strong>PN</strong> (Package Name)</li>
+        <li><strong>PV</strong> (Package Version)</li>
+        <li><strong>PR</strong> (Package Revision)</li>
+        <li><strong>WORKDIR</strong> (Working Directory)</li>
+        <li><strong>S</strong> (Source)</li>
+        <li><strong>D</strong> (Destination)</li>
+        <li><strong>B</strong> (Build Directory)</li>
+    </ul>
+
+    <h3>Recipe Name Pattern</h3>
+    <p>
+        Yocto recipe filenames follow a specific pattern:
+    </p>
+    <pre><strong>PN_PV_PR.bb</strong></pre>
+    <p>
+        <em>Example:</em>
+    </p>
+    <pre>example2_0.2_r0.bb</pre>
+    <p>
+        This filename includes the package name (<code>PN</code>), version (<code>PV</code>), and revision
+        (<code>PR</code>).
+    </p>
+
+    <h3>Reading a Variable Values</h3>
+    <p>
+        To inspect the value of a variable in a recipe, use the following command:
+    </p>
+    <pre><code>bitbake -e &lt;RECIPE_NAME&gt; | grep ^&lt;VARIABLE_NAME&gt;=</code></pre>
+    <p>
+        <em>Example:</em>
+    </p>
+    <pre><code>bitbake -e example2 | grep ^PV=
+#Output: PV="0.1"</code></pre>
+
+    <h3>Package Name (PN)</h3>
+    <p>
+        The <strong>PN</strong> variable represents the package name. It is automatically extracted from the recipe
+        filename. For example, if the recipe is named <code>example2_0.2_r0.bb</code>, the value of <code>PN</code> will
+        be <code>example2</code>.
+    </p>
+
+    <h3>Package Version (PV)</h3>
+    <p>
+        The <strong>PV</strong> variable represents the package version. Like <code>PN</code>, it is extracted from the
+        recipe filename. In the example <code>example2_0.2_r0.bb</code>, the value of <code>PV</code> will be
+        <code>0.2</code>.
+    </p>
+
+    <h3>Package Revision (PR)</h3>
+    <p>
+        The <strong>PR</strong> variable represents the package revision. It is used to track changes to the recipe
+        without altering the version. The default value is <code>r0</code>.
+    </p>
+
+    <h3>Working Directory (WORKDIR)</h3>
+    <p>
+        The <strong>WORKDIR</strong> variable specifies the directory where the Yocto build system processes and builds
+        a recipe. It is located within the <code>TMPDIR</code> directory structure and is unique to each recipe and
+        system.
+    </p>
+
+    <h3>Source (S)</h3>
+    <p>
+        The <strong>S</strong> variable points to the directory where the unpacked source code for the recipe resides.
+        By default, it is located at:
+    </p>
+    <pre>WORKDIR/BPN-PV</pre>
+    <p>
+        where <code>BPN</code> is the base recipe name and <code>PV</code> is the recipe version.
+    </p>
+
+    <h3>Destination (D)</h3>
+    <p>
+        The <strong>D</strong> variable specifies the directory where the build system installs components during the
+        <code>do_install</code> task. By default, it is located at:
+    </p>
+    <pre>WORKDIR/image</pre>
+
+    <h3>Build Directory (B)</h3>
+    <p>
+        The <strong>B</strong> variable is the same as <code>S</code> and refers to the directory where the build
+        process occurs.
+    </p>
+    
+    <h3>Conclusion</h3>
+    <p>
+        These variables play a critical role in defining key aspects of the build process, such as package identification, source code location, and installation directories. Understanding these variables is essential for effectively managing and customizing your embedded Linux projects. With this knowledge, you can begin to tailor your build configurations, troubleshoot issues more efficiently, and gain greater control over the Yocto build system. 
+    </p>
+    
+    <h3>Reference Link</h3>
+    <p>
+        For more details, refer to the official Yocto documentation:
+        <a href="https://docs.yoctoproject.org/dev/overview-manual/yp-intro.html#the-yocto-project-layer-model">Yocto
+            Layer Model Overview</a>.
+    </p>
+
+</section>
