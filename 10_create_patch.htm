@@ -1,0 +1,87 @@
+<section class="chapter 10" id="10_create_patch">
+    <h2>10# Creating a Patch</h2>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/jeMzB8N-wR0?si=VseKxVoVhr7lm3n2" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <p>In this tutorial, we will explore the process of creating and applying patches in Yocto. By the end of this tutorial, you will understand how to generate a patch file, integrate it into your recipe, and apply it during the build process.</p>
+        
+        <h3>Topics Covered</h3>
+        <ul>
+            <li>What is patching?</li>
+            <li>How to write a patch?</li>
+            <li>How to save a patch?</li>
+            <li>How to apply a patch?</li>
+        </ul>    
+        
+        <h3>What is Patching?</h3>
+        <p>Patching in Yocto involves making modifications to the source code of a package and saving those changes as a patch file. This allows you to incorporate custom updates or fixes into your recipes without altering the original source code directly. Patch files are stored in the `files` directory of your recipe and applied automatically during the build process.</p>
+
+        <h3>How Does Patching Work in Yocto?</h3>
+        <p>In Yocto, patches are applied during the `do_patch` task. When you include a patch file in the `SRC_URI` variable of a recipe, the build system automatically applies it to the source code. This ensures that your custom modifications are incorporated into the final package.</p>
+        
+        <h3>Steps to Create and Apply a Patch</h3>
+        <ul>
+            <li><strong>Enter Devshell:</strong> Use the following command to enter the development shell for the recipe:
+                <pre><code>bitbake -c devshell <recipe-name></code></pre>
+                This opens an interactive shell where you can modify the source code.
+            </li>
+            <li><strong>Initialize Git Repository:</strong> Initialize a Git repository in the source directory:
+                <pre><code>git init</code></pre>
+            </li>
+            <li><strong>Add Files to Git:</strong> Add all files in the source directory to the Git repository:
+                <pre><code>git add *</code></pre>
+            </li>
+            <li><strong>Create Initial Commit:</strong> Record the current state of the source tree with a Git commit:
+                <pre><code>git commit -m "Initialization"</code></pre>
+                This establishes a baseline for tracking changes.
+            </li>
+            <li><strong>Edit the Source File:</strong> Modify the desired file using your preferred editor (e.g., `vi`):
+                <pre><code>vi /path/to/file</code></pre>
+                Save the changes after editing.
+            </li>
+            <li><strong>Check Modified Files:</strong> Verify that the file has been modified:
+                <pre><code>git status</code></pre>
+                The output will indicate which files have been altered.
+            </li>
+            <li><strong>Stage the Modified File:</strong> Add the modified file to the Git staging area:
+                <pre><code>git add /path/to/file</code></pre>
+            </li>
+            <li><strong>Commit the Changes:</strong> Commit the changes with a descriptive message:
+                <pre><code>git commit -m "A suitable comment according to the changes you made"</code></pre>
+            </li>
+            <li><strong>View Commit History:</strong> Review the commit history to confirm the changes:
+                <pre><code>git log</code></pre>
+            </li>
+            <li><strong>Generate the Patch File:</strong> Create a patch file based on the last commit:
+                <pre><code>git format-patch HEAD~1</code></pre>
+                This generates a patch file (e.g., `0001-A-suitable-comment.patch`) in the current directory.
+            </li>
+            <li><strong>Verify the Patch File:</strong> Check if the patch file has been created:
+                <pre><code>ls</code></pre>
+            </li>
+            <li><strong>Copy the Patch File:</strong> Move the patch file to the `files` directory of your recipe:
+                <pre><code>cp 0001-A-suitable-comment.patch /path/to/recipe/files</code></pre>
+            </li>
+            <li><strong>Exit Devshell:</strong> Exit the development shell:
+                <pre><code>exit</code></pre>
+            </li>
+            <li><strong>Update the Recipe:</strong> Edit the recipe file (`recipe.bb`) or create a `.bbappend` file to include the patch in the `SRC_URI` variable:
+                <pre><code>FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+SRC_URI += "file://0001-A-suitable-comment.patch"</code></pre>
+                This ensures the patch is applied during the build process.
+            </li>
+            <li><strong>Rebuild the Image:</strong> Rebuild the image to apply the patch:
+                <pre><code>bitbake &lt;image-name&gt;</code></pre>
+            </li>
+        </ul>
+        
+        <h3>Conclusion</h3>
+        <p>In this tutorial, we learned how to create and apply patches in the Yocto Project. By following the outlined steps, you can make targeted changes to the source code of a package and ensure they are integrated seamlessly into your build process. Patching is a powerful tool for customizing software behavior, fixing bugs, or adding features to your embedded Linux projects. In the next video, we will explore more advanced techniques for managing patches and customizing recipes.</p>
+        
+        <h3>Reference Links</h3>
+        <ul>
+            <li><a href="https://docs.yoctoproject.org/ref-manual/tasks.html" target="_blank">Yocto Build Tasks Documentation</a></li>
+            <li><a href="https://docs.yoctoproject.org/bitbake/2.2/bitbake-user-manual/bitbake-user-manual-metadata.html" target="_blank">BitBake Metadata Documentation</a></li>
+        </ul>
+        
+    </section>

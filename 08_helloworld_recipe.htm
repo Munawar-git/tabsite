@@ -1,0 +1,164 @@
+<section class="chapter 08" id="08_helloworld_recipe">
+    <h2>08# Creating a Recipe from Scratch</h2>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/YSITCPhk_qU?si=aADcUqtnvCimQBD2" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
+    <p>In this tutorial, we will walk through the process of creating a "Hello World" recipe from scratch in the Yocto
+        build system. we will create a complete Yocto recipe that builds and installs a simple C program ("Hello World")
+        into the final image. This is an excellent starting point for understanding how recipes work and how to define
+        custom packages for your embedded Linux projects.</p>
+
+    <h3>Creating the Structure for the Recipe</h3>
+    <p>To create the structure for our "Hello World" recipe, follow these steps:</p>
+    <ul>
+        <li>Navigate to the `meta-tab-layer` folder created previously:
+            <pre><code>cd /path/to/poky/meta-tab-layer</code></pre>
+        </li>
+        <li>Go to the `recipes-example` folder:
+            <pre><code>cd recipes-example</code></pre>
+        </li>
+        <li>Create a new folder for the recipe (named `helloworld`) and navigate into it:
+            <pre><code>mkdir helloworld
+cd helloworld</code></pre>
+        </li>
+        <li>Create the recipe file (`helloworld.bb`) and a `files` folder to store the source files:
+            <pre><code>touch helloworld.bb
+mkdir files</code></pre>
+        </li>
+        <li>Go to the `files` folder and create `helloworld.c` file:
+            <pre><code>cd files
+touch helloworld.c</code></pre>
+        </li>
+        <li>Verify the directory structure using the `tree` command:
+            <pre><code>cd ../../
+tree helloworld</code></pre>
+            <p>Your structure should look like this:</p>
+            <pre><code>helloworld
+├── files
+│   └── helloworld.c
+└── helloworld.bb</code></pre>
+        </li>
+    </ul>
+
+    <h3>Sample C Code</h3>
+    <p>Open the `helloworld.c` file in your editor and add the following code:</p>
+    <pre><code>#include &lt;stdio.h&gt;
+int main(void) {
+    printf("Hello, world!\n");
+    return 0;
+}</code></pre>
+    <p>Save the file after adding the code.</p>
+
+    <h3>Writing the Recipe</h3>
+    <p>Now, open the `helloworld.bb` file in your editor and add the following content:</p>
+
+    <div class="recipe">
+        <p><strong>SUMMARY: </strong>
+            This provides a brief description of the recipe:</p>
+        <pre><code>SUMMARY = "Hello World program"</code></pre>
+
+        <p><strong>LICENSE:</strong>
+            Specifies the type of license for the package. Here, we use the MIT license, which allows anyone to use,
+            reuse, edit, and distribute the recipe:</p>
+        <pre><code>LICENSE = "MIT"</code></pre>
+
+        <p><strong>LIC_FILES_CHKSUM:</strong>
+            This variable ensures compliance with licensing requirements by specifying the location of the license file
+            and its MD5 checksum. To calculate the checksum:</p>
+        <ul>
+            <li>Navigate to the `poky/meta` folder:</li>
+            <li>Run the following command to get the MD5 checksum of the MIT license file:
+                <pre><code>md5sum COPYING.MIT
+# Output: 3da9cfbcb788c80a0384361b4de20420  COPYING.MIT</code></pre>
+            </li>
+            <li>Add the path and checksum to the recipe:
+                <pre><code>LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"</code></pre>
+            </li>
+        </ul>
+
+        <p><strong>SRC_URI:</strong>
+            This variable specifies the source files required for the recipe. Add the following line to include the
+            `helloworld.c` file:</p>
+        <pre><code>SRC_URI = "file://helloworld.c"</code></pre>
+
+        <p><strong>S:</strong>
+            The `S` variable defines the path to the source folder where the final built package will reside:</p>
+        <pre><code>S = "${WORKDIR}/build"</code></pre>
+
+        <p><strong>do_compile:</strong>
+            This task describes how the source files should be compiled. The following code compiles the `helloworld.c`
+            file and stores the binary in the source folder:</p>
+        <pre><code>do_compile() {
+    ${CC} ${CFLAGS} ${LDFLAGS} ${WORKDIR}/helloworld.c -o ${S}/helloworld 
+}</code></pre>
+
+        <p><strong>do_install:</strong>
+            This task specifies where the compiled binary should be installed in the final image. The binary is copied
+            to `/usr/bin` in the destination folder:</p>
+        <pre><code>do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/helloworld ${D}${bindir}/
+}</code></pre>
+    </div>
+    <h3>Complete Recipe</h3>
+    <p>Here is the full content of the `helloworld.bb` file:</p>
+    <pre><code>SUMMARY = "Hello World program"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+SRC_URI = "file://helloworld.c"
+S = "${WORKDIR}/build"
+
+do_compile() {
+    ${CC} ${CFLAGS} ${LDFLAGS} ${WORKDIR}/helloworld.c -o ${S}/helloworld 
+}
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/helloworld ${D}${bindir}/
+}</code></pre>
+
+    <h3>Building the Recipe</h3>
+    <ul>
+        <li>Source the environment by navigating to the `poky` folder:
+            <pre><code>source oe-init-build-env</code></pre>
+        </li>
+        <li>Open the `local.conf` file and append the following line to include the `helloworld` package in the image:
+            <pre><code>IMAGE_INSTALL:append = " helloworld"</code></pre>
+        </li>
+        <li>Build the entire image using the following command:
+            <pre><code>bitbake core-image-full-cmdline</code></pre>
+        </li>
+        <li>After the build completes, flash the image to your BeagleBone Black as described in Tutorial #01 and boot
+            the device.</li>
+    </ul>
+
+    <h3>Testing the Recipe</h3>
+    <p>Once the image is flashed and the device is booted, test the installation of the `helloworld` package:</p>
+    <ul>
+        <li>Check if the package is installed:
+            <pre><code>which helloworld
+# Output: /usr/bin/helloworld</code></pre>
+        </li>
+        <li>Run the `helloworld` program:
+            <pre><code>helloworld
+# Output: Hello, world!</code></pre>
+        </li>
+    </ul>
+
+    <h3>Conclusion</h3>
+    <p>In this tutorial, we successfully created a "Hello World" recipe from scratch in the Yocto build system. We
+        covered everything from setting up the directory structure and writing the recipe file to building and testing
+        the package on the target device. This example demonstrates the fundamental steps involved in creating custom
+        packages for your embedded Linux projects.</p>
+
+    <h3>Reference Link</h3>
+    <p>For more information on BitBake variables and metadata, refer to the official documentation: <a
+            href="https://docs.yoctoproject.org/bitbake/2.2/bitbake-user-manual/bitbake-user-manual-metadata.html"
+            target="_blank">BitBake Metadata Documentation</a>.</p>
+
+
+</section>

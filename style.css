@@ -107,6 +107,7 @@ p a::after {
     font-size: 1rem;
     text-decoration: none;
     color: var(--main-clr);
+    border-radius: 10px;
     transition: background-color 0.3s ease;
 }
 
@@ -232,4 +233,8 @@ p a::after {
     border-radius: 20px;
     height: 365px;
     width: 650px;
+}
+
+.recipe p{
+    margin-top: 1.2rem;
 }

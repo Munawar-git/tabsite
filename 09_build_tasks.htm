@@ -1,0 +1,278 @@
+<section class="chapter 09" id="09_build_tasks">
+    <h2>09# Yocto Build Tasks</h2>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/a6dB7Z2HlNM?si=8FjTtp9m-K8V_RAw" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
+    <p>In this tutorial, we will explore the common build tasks in the Yocto Project and
+        understand their roles in the build process. Build tasks are essential units of execution that perform specific
+        functions during the creation of a package or image. By mastering these tasks, you can gain deeper insights into
+        how Yocto processes recipes and troubleshoot issues more effectively.</p>
+
+    <h4>What are you going to learn?</h4>
+    <p>In this video, we will delve into the common build tasks used in Yocto, including fetching, unpacking, patching,
+        configuring, compiling, and installing. We will also demonstrate how to execute these tasks explicitly using
+        BitBake commands.</p>
+
+    <h4>Topics Covered</h4>
+    <ul>
+        <li>Understanding build tasks in Yocto.</li>
+        <li>Listing all available tasks for a recipe.</li>
+        <li>Detailed descriptions of common build tasks such as fetch, unpack, patch, configure, compile, and install.
+        </li>
+        <li>Executing tasks explicitly using BitBake commands.</li>
+    </ul>
+
+    <h4>Required Files</h4>
+    <p>The `meta-tab-layer` layer used in this tutorial can be cloned from the following repository:</p>
+    <pre><code>git clone https://github.com/Munawar-git/meta-tab-layer.git</code></pre>
+
+    <h4>What are Build Tasks?</h4>
+    <p>Build tasks in Yocto represent units of execution responsible for performing specific functions or a set of
+        related functions during the build process. These tasks are executed sequentially by BitBake to ensure the
+        successful creation of packages and images.</p>
+
+    <h4>How to List the Build Tasks of a Recipe?</h4>
+    <p>To list all the tasks defined for a specific recipe, use the following command:</p>
+    <pre><code>bitbake -c listtasks <recipe-name></code></pre>
+    <p>For example:</p>
+    <pre><code>bitbake -c listtasks bbb-example</code></pre>
+    <p>This will output a list of tasks, such as:</p>
+    <ul>
+        <li><code>do_fetch</code>: Fetches the source code.</li>
+        <li><code>do_unpack</code>: Unpacks the source code into a working directory.</li>
+        <li><code>do_patch</code>: Applies patches to the source code if any are available.</li>
+        <li><code>do_configure</code>: Configures the source with build-time options.</li>
+        <li><code>do_compile</code>: Compiles the source code into binaries.</li>
+        <li><code>do_install</code>: Copies files from the compilation directory to a holding area.</li>
+        <li><code>do_package</code>: Splits the content of the holding area into subsets based on available packages and
+            files.</li>
+    </ul>
+
+    <hr>
+    <h3>Fetch Task</h3>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/ZIJACtKHN84?si=JtrkNdirHdGmPByo" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h4>What are we going to learn?</h4>
+    <ul>
+        <li>What is the Fetch task?</li>
+        <li>Where to define the fetch repository?</li>
+        <li>How to define the fetch repository?</li>
+        <li>What is the SRCREV variable?</li>
+        <li>How to fetch source from a remote repository?</li>
+        <li>Where are sources downloaded?</li>
+    </ul>
+
+    <h4>What is the Fetch Task?</h4>
+    <p>The Fetch task retrieves the package source from either a local or remote repository. It ensures that the
+        required source code is available for subsequent tasks.</p>
+
+    <h4>Where to Define the Fetch Repository?</h4>
+    <p>The repository address is stored in the <code>SRC_URI</code> variable within the recipe file.</p>
+
+    <h4>What is the SRCREV Variable?</h4>
+    <p>The <code>SRCREV</code> variable specifies the commit hash of the repository (e.g., GitHub) to ensure
+        reproducibility. For example:</p>
+    <pre><code>SRCREV = "f1be90c683cc1fe31f58f3f8b081562e8b5c8230"</code></pre>
+
+    <h4>How to Fetch Source?</h4>
+    <p>While the build process automatically fetches the source, you can execute the Fetch task explicitly for analysis:
+    </p>
+    <pre><code># Syntax: bitbake -c do_fetch <recipe-name>
+bitbake -c do_fetch bbb-example</code></pre>
+
+    <hr>
+    <h3>Unpack Task</h3>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/1KpKzFY9rw0?si=hFnQGdZHE1eAbVnf" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h4>What are we going to learn?</h4>
+    <ul>
+        <li>What is the Unpack task?</li>
+        <li>How to unpack the source?</li>
+        <li>Where does it unpack?</li>
+    </ul>
+
+    <h4>What is the Unpack Task?</h4>
+    <p>The Unpack task extracts the source code fetched by the Fetch task into a working directory.</p>
+
+    <h4>How to Unpack the Source?</h4>
+    <p>Although the build process handles unpacking automatically, you can execute it explicitly for analysis:</p>
+    <pre><code># Syntax: bitbake -c do_unpack <recipe-name>
+bitbake -c do_unpack bbb-example</code></pre>
+
+    <h4>Where Does It Unpack?</h4>
+    <p>The Unpack task places the extracted source code into the <code>WORKDIR</code> folder.</p>
+
+    <hr>
+    <h3>Patch Task</h3>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/H3LVO1zRpBA?si=Aj86A0NiGrXaUwDG" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h4>What are we going to learn?</h4>
+    <ul>
+        <li>What is the Patch task?</li>
+        <li>What is a patch file?</li>
+        <li>Where to define the patch file?</li>
+        <li>Where does it run?</li>
+        <li>How to apply patches?</li>
+    </ul>
+
+    <h4>What is the Patch Task?</h4>
+    <p>The Patch task locates and applies patches to the source code if any patches are available. This step is optional
+        but crucial for applying custom modifications to the source.</p>
+
+    <h4>What is a Patch File?</h4>
+    <p>A patch file contains explicit changes to a specific file, which can be applied to modify the original source
+        code.</p>
+
+    <h4>Where to Define the Patch File?</h4>
+    <p>Patch files are specified in the <code>SRC_URI</code> variable within the recipe file.</p>
+
+    <h4>Where Does It Run?</h4>
+    <p>By default, the Patch task runs in the current source directory (<code>${S}</code>).</p>
+
+    <h4>How to Apply Patches?</h4>
+    <p>While the build process applies patches automatically, you can execute the Patch task explicitly for analysis:
+    </p>
+    <pre><code># Syntax: bitbake -c do_patch <recipe-name>
+bitbake -c do_patch bbb-example</code></pre>
+
+    <hr>
+    <h3>Configure Task</h3>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/YuB_bxjFePs?si=22114N51Irf1relZ" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h4>What are we going to learn?</h4>
+    <ul>
+        <li>What is the Configure task?</li>
+        <li>How to define configuration steps?</li>
+        <li>Where does it run?</li>
+        <li>How to apply configuration?</li>
+    </ul>
+
+    <h4>What is the Configure Task?</h4>
+    <p>The Configure task sets up the source code by enabling or disabling build-time and configuration options before
+        compilation. This step is optional and only executes if configuration steps are defined.</p>
+
+    <h4>How to Define Configuration Steps?</h4>
+    <p>If configuration steps are required, they are defined in the <code>do_configure()</code> function of the BitBake
+        recipe:</p>
+    <pre><code>do_configure() {
+    # Configuration steps are written here
+    }</code></pre>
+    <p>Refer to the <code>bbb-example.bb</code> file for an example of <code>do_configure</code> steps.</p>
+
+    <h4>Where Does It Run?</h4>
+    <p>The Configure task runs in the current source directory (<code>${S}</code>).</p>
+
+    <h4>How to Apply Configuration?</h4>
+    <p>Although the build process applies configuration automatically, you can execute the Configure task explicitly for
+        analysis:</p>
+    <pre><code># Syntax: bitbake -c do_configure <recipe-name>
+bitbake -c do_configure bbb-example</code></pre>
+
+    <hr>
+    <h3>Compile Task</h3>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/RtAAO6uZ59k?si=M-se2aYKtmIb611I" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h4>What are we going to learn?</h4>
+    <ul>
+        <li>What is the Compile task?</li>
+        <li>How to define compilation steps?</li>
+        <li>Where does it run?</li>
+        <li>How to execute compilation?</li>
+    </ul>
+
+    <h4>What is the Compile Task?</h4>
+    <p>The Compile task compiles the source code into binary files if compilation steps are defined. This step is
+        optional and only executes if necessary.</p>
+
+    <h4>How to Define Compilation Steps?</h4>
+    <p>Compilation steps are defined in the <code>do_compile()</code> function of the BitBake recipe:</p>
+    <pre><code>do_compile() {
+    # Compilation steps are written here
+    }</code></pre>
+    <p>Refer to the <code>bbb-example.bb</code> file for an example of <code>do_compile</code> steps.</p>
+
+    <h4>Where Does It Run?</h4>
+    <p>The Compile task runs in the current source directory (<code>${S}</code>).</p>
+
+    <h4>How to Execute Compilation?</h4>
+    <p>While the build process handles compilation automatically, you can execute the Compile task explicitly for
+        analysis:</p>
+    <pre><code># Syntax: bitbake -c do_compile <recipe-name>
+bitbake -c do_compile bbb-example</code></pre>
+
+    <hr>
+    <h3>Install Task</h3>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/ZKIcylBUNw8?si=KB1MM2NnShXY2B16" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h4>What are we going to learn?</h4>
+    <ul>
+        <li>What is the Install task?</li>
+        <li>How to define installation steps?</li>
+        <li>Where does it run?</li>
+        <li>How to perform installation?</li>
+    </ul>
+
+    <h4>What is the Install Task?</h4>
+    <p>The Install task copies files from the compilation directory to the holding area (<code>${D}</code>) for
+        packaging. It ensures that the necessary files are prepared for inclusion in the final image.</p>
+
+    <h4>How to Define Installation Steps?</h4>
+    <p>Installation steps are defined in the <code>do_install()</code> function of the BitBake recipe:</p>
+    <pre><code>do_install() {
+    # Installation steps are written here
+    }</code></pre>
+    <p>Refer to the <code>bbb-example.bb</code> file for an example of <code>do_install</code> steps.</p>
+
+    <h4>Where Does It Run?</h4>
+    <p>The Install task runs in the current source directory (<code>${S}</code>).</p>
+
+    <h4>How to Perform Installation?</h4>
+    <p>Although the build process handles installation automatically, you can execute the Install task explicitly for
+        analysis:</p>
+    <pre><code># Syntax: bitbake -c do_install <recipe-name>
+bitbake -c do_install bbb-example</code></pre>
+
+    <h3>Conclusion</h3>
+    <p>In this tutorial, we explored the common build tasks in Yocto, including Fetch, Unpack, Patch, Configure,
+        Compile, and Install. Each task plays a critical role in the build process, ensuring that the source code is
+        retrieved, modified, compiled, and packaged correctly. While these tasks are executed automatically during the
+        build process, understanding how to invoke them explicitly allows you to debug and analyze each step in detail.
+        In the next video, we will dive deeper into advanced topics related to BitBake tasks.</p>
+
+    <h3>Reference Links</h3>
+    <ul>
+        <li><a href="https://docs.yoctoproject.org/ref-manual/tasks.html" target="_blank">Yocto Build Tasks
+                Documentation</a></li>
+        <li><a href="https://docs.yoctoproject.org/bitbake/2.2/bitbake-user-manual/bitbake-user-manual-metadata.html"
+                target="_blank">BitBake Metadata Documentation</a></li>
+    </ul>
+
+</section>
