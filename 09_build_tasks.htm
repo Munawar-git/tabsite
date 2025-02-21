@@ -12,12 +12,11 @@
         functions during the creation of a package or image. By mastering these tasks, you can gain deeper insights into
         how Yocto processes recipes and troubleshoot issues more effectively.</p>
 
-    <h4>What are you going to learn?</h4>
-    <p>In this video, we will delve into the common build tasks used in Yocto, including fetching, unpacking, patching,
+    <p>We will delve into the common build tasks used in Yocto, including fetching, unpacking, patching,
         configuring, compiling, and installing. We will also demonstrate how to execute these tasks explicitly using
         BitBake commands.</p>
 
-    <h4>Topics Covered</h4>
+    <h3>Topics Covered</h3>
     <ul>
         <li>Understanding build tasks in Yocto.</li>
         <li>Listing all available tasks for a recipe.</li>
@@ -26,16 +25,16 @@
         <li>Executing tasks explicitly using BitBake commands.</li>
     </ul>
 
-    <h4>Required Files</h4>
+    <h3>Required Files</h3>
     <p>The `meta-tab-layer` layer used in this tutorial can be cloned from the following repository:</p>
     <pre><code>git clone https://github.com/Munawar-git/meta-tab-layer.git</code></pre>
 
-    <h4>What are Build Tasks?</h4>
+    <h3>What are Build Tasks?</h3>
     <p>Build tasks in Yocto represent units of execution responsible for performing specific functions or a set of
         related functions during the build process. These tasks are executed sequentially by BitBake to ensure the
         successful creation of packages and images.</p>
 
-    <h4>How to List the Build Tasks of a Recipe?</h4>
+    <h3>Listing the Tasks of a Recipe</h3>
     <p>To list all the tasks defined for a specific recipe, use the following command:</p>
     <pre><code>bitbake -c listtasks <recipe-name></code></pre>
     <p>For example:</p>
