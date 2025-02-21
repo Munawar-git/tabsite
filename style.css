@@ -238,3 +238,26 @@ p a::after {
 .recipe p{
     margin-top: 1.2rem;
 }
+
+/* Scrollbar styling for Chrome, Edge, and Safari */
+::-webkit-scrollbar {
+    width: 18px; /* Width of the scrollbar */
+    padding: 4px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--pri-clr); /* Color of the track */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--main-clr); /* Color of the scroll thumb */
+    border-radius: 20px; /* Rounded corners for the thumb */
+    border: 2px solid var(--sec-clr); /* Border around the thumb */
+  }
+  
+  /* Scrollbar styling for Firefox */
+  * {
+    scrollbar-width: thin; /* "auto" or "thin" for Firefox */
+    scrollbar-color: var(--main-clr) var(--pri-clr); /* Thumb and track color */
+  }
+  
