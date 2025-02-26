@@ -1,0 +1,136 @@
+<section class="chapter 11" id="11_rdepends">
+    <h2>11# Runtime Dependency with RDEPENDS</h2>
+    <div class="video-frame">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/x4CgMt7VqNo?si=77-LbOKuFRNtgTOp"
+            title="YouTube video player" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
+    <p>In this tutorial, we will explore the RDEPENDS variable in the Yocto Project and
+        understand its role in specifying runtime dependencies for packages. Managing dependencies is crucial for
+        ensuring that your software functions correctly on the target system. By mastering RDEPENDS, you can create
+        robust recipes that include all necessary components.</p>
+   <p>By the end of this tutorial, you
+        will understand why and how to specify runtime dependencies in your recipes.</p>
+
+
+    <h3>About RDEPENDS</h3>
+    <p>In the Yocto Project, RDEPENDS is a variable used to specify runtime dependencies for a particular package or
+        recipe. It ensures that other packages or components required for the proper functioning of the current package
+        during runtime are included in the final image.</p>
+
+    <p>When building embedded Linux systems, it's essential to ensure that all necessary components are present on the
+        target device for the package to function correctly. Without specifying runtime dependencies, the build system
+        might not include these components, leading to runtime errors or incomplete functionality. RDEPENDS helps
+        automate this process by informing the package manager about the required dependencies.</p>
+
+    <h3>Usage</h3>
+    <p>The RDEPENDS variable is defined within the recipe file (`.bb` or `.bbappend`) of the package that requires
+        specific runtime dependencies. 
+        For example, if
+        Recipe-A builds Package-A and Package-A requires Package-B to function correctly, you would add RDEPENDS to Recipe-A to ensure
+        Package-B is included in the final image.
+        You can specify multiple dependencies as a space-separated list of package names.
+    </p>
+
+    <p><strong>Syntax:</strong></p>
+    <pre><code>RDEPENDS:${PN} = "package1 package2 ..."</code></pre>
+
+    <p><strong>Example:</strong></p>
+    <pre><code>RDEPENDS:${PN} = "libfoo libbar bash"</code></pre>
+
+    <p>In the example above, the package being built depends on `libfoo`, `libbar`, and `bash` at runtime. These
+        dependencies will be automatically included in the final image if they are not already present.</p>
+
+    <h3>Recipe Example</h3>
+    <p>Let's consider an example where we create a recipe that copies a simple Bash script (`helloWorld.sh`) into the
+        `/usr/bin` directory of the final image. To ensure the script works correctly, we must specify `bash` as a runtime dependency using RDEPENDS.
+    </p>
+
+    <h4>Folder Structure inside `meta-tab-layer`</h4>
+    <pre><code>recipes-example/rdepends-example/
+├── files
+│   └── helloWorld.sh
+└── rdepends-example.bb</code></pre>
+
+    <h4>Bash Script: `helloWorld.sh`</h4>
+    <p>This script prints different types of messages just to test the recipe:</p>
+    <pre><code>#!/bin/bash
+isPresent="$(which echostatus)"
+if [[ -n $isPresent ]]; then
+    echostatus i -b "This is Info Message"
+    echostatus w -b "This is Warning Message"
+    echostatus e -b "This is Error Message"
+    echostatus s -b "This is Success Message"
+else
+    echo "This is Info Message"
+    echo "This is Warning Message"
+    echo "This is Error Message"
+    echo "This is Success Message"
+fi</code></pre>
+
+    <h4>Recipe: `rdepends-example.bb`</h4>
+    <p>Below is the complete recipe file:</p>
+    <pre><code>SUMMARY = "Copies bash script in /usr/bin"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://helloWorld.sh"
+S = "${WORKDIR}"
+
+# Specify runtime dependencies
+RDEPENDS:${PN} = "bash"
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/helloWorld.sh ${D}${bindir}/
+}</code></pre>
+
+
+    <h3>Testing the Recipe</h3>
+    <p>To test the importance of the RDEPENDS variable, follow these steps:</p>
+
+    <ul>
+        <li><strong>Remove the RDEPENDS Line:</strong> Temporarily remove the `RDEPENDS:${PN} = "bash"` line from the
+            recipe.</li>
+        <li><strong>Build the Recipe:</strong> Navigate to the `poky` folder and source the environment:
+            <pre><code>source oe-init-build-env</code></pre>
+            Then, build the recipe:
+            <pre><code>bitbake rdepends-example</code></pre>
+        </li>
+        <li><strong>Error During Build:</strong> If the RDEPENDS line is missing, the build process will fail with the
+            following error:</li>
+    </ul>
+
+    <div class="error">
+        <p><strong>ERROR:</strong> rdepends-example-1.0-r0 do_package_qa: QA Issue: /usr/bin/helloWorld.sh contained in
+            package rdepends-example requires /bin/bash, but no providers found in RDEPENDS:rdepends-example?
+            [file-rdeps]</p>
+        <p><strong>ERROR:</strong> rdepends-example-1.0-r0 do_package_qa: Fatal QA errors were found, failing task.</p>
+        <p><strong>ERROR:</strong> Logfile of failure stored in:
+            /path/to/sources/tmp/work/cortexa8hf-neon-poky-linux-gnueabi/rdepends-example/1.0-r0/temp/log.do_package_qa.27830
+        </p>
+        <p><strong>ERROR:</strong> Task
+            (/path/to/poky/meta-tab-layer/recipes-example/rdepends-example/rdepends-example.bb:do_package_qa) failed
+            with exit code '1'</p>
+    </div>
+
+    <p><strong>Resolution:</strong> Add the RDEPENDS line back to the recipe:</p>
+    <pre><code>RDEPENDS:${PN} = "bash"</code></pre>
+
+    <p>Rebuild the recipe, and it will succeed because the `bash` package is now included as a runtime dependency.</p>
+
+    <h3>Conclusion</h3>
+    <p>In this tutorial, we explored the RDEPENDS variable in the Yocto Project and demonstrated its importance
+        through a practical example. By specifying runtime dependencies, you ensure that all necessary components are
+        included in the final image, preventing runtime errors and improving the reliability of your embedded Linux
+        system. Understanding and using RDEPENDS effectively is a key skill for creating robust recipes in Yocto.</p>
+
+    <h4>Reference Links</h4>
+    <ul>
+        <li><a href="https://docs.yoctoproject.org/ref-manual/variables.html#term-RDEPENDS" target="_blank">RDEPENDS
+                Documentation</a></li>
+    </ul>
+
+</section>

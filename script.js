@@ -101,3 +101,7 @@ document.getElementById("09").addEventListener("click", function () {
 document.getElementById("10").addEventListener("click", function () {
     loadHTML("10_create_patch.htm", "content_area");
 });
+
+document.getElementById("11").addEventListener("click", function () {
+    loadHTML("11_rdepends.htm", "content_area");
+});

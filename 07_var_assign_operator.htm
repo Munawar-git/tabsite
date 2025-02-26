@@ -1,40 +1,64 @@
 <section class="chapter 07" id="07_var_assign_operator">
     <h2>07# Variables Assignment Operators</h2>
     <div class="video-frame">
-        <iframe src="https://www.youtube.com/embed/kCl6D5WwBXQ?si=8esYSEkJRQ551tkc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <iframe src="https://www.youtube.com/embed/kCl6D5WwBXQ?si=8esYSEkJRQ551tkc" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </div>
 
-<p>In this tutorial, we will explore the various types of variable assignments used in the Yocto build system. Understanding these assignment types is crucial for effectively managing and customizing metadata within recipes, as they control how variables are defined, expanded, and modified during the build process.</p>
+    <p>In this tutorial, we will explore the various types of variable assignments used in the Yocto build system.
+        Understanding these assignment types is crucial for effectively managing and customizing metadata within
+        recipes, as they control how variables are defined, expanded, and modified during the build process.</p>
 
-<h3>What are you going to learn?</h3>
-<p>In this video, we will delve into the different types of variable assignments available in Yocto. You will learn how each assignment type behaves and when to use them in your recipes.</p>
+    <h3>What are you going to learn?</h3>
+    <p>In this video, we will delve into the different types of variable assignments available in Yocto. You will learn
+        how each assignment type behaves and when to use them in your recipes.</p>
 
-<h3>Types of Variable Assignments</h3>
-<ul>
-    <li><strong>?=</strong>: Assigns a default value to a variable if it has not already been assigned. It can be overridden by subsequent assignments.</li>
-    <li><strong>??=</strong>: Also assigns a default value to a variable, but it is a weaker assignment compared to <code>?=</code>. If multiple assignments are done with this type, the last one takes precedence.</li>
-    <li><strong>=</strong>: A simple variable assignment. Spaces are significant, and quotes are often required. Variables are expanded at the end of the parsing process.</li>
-    <li><strong>:=</strong>: Immediate variable expansion. The value assigned is expanded immediately when the variable is parsed.</li>
-    <li><strong>+=</strong>: Appends a value to a variable, inserting a space between the current value and the appended value. The change takes effect immediately.</li>
-    <li><strong>=+</strong>: Prepends a value to a variable, inserting a space between the current value and the prepended value. The change takes effect immediately.</li>
-    <li><strong>.=</strong>: Appends a value to a variable without adding a space between the current value and the appended value. The change takes effect immediately.</li>
-    <li><strong>=.</strong>: Prepends a value to a variable without adding a space between the current value and the prepended value. The change takes effect immediately.</li>
-    <li><strong>:append</strong>: Appends a value to a variable without adding a space. The effect is applied at variable expansion time rather than immediately.</li>
-    <li><strong>:prepend</strong>: Prepends a value to a variable without adding a space. The effect is applied at variable expansion time rather than immediately.</li>
-    <li><strong>:remove</strong>: Removes specified values from lists. All occurrences of the specified value are removed from the variable.</li>
-</ul>
+    <h3>Types of Variable Assignments</h3>
+    <ul>
+        <li><strong>?=</strong>: Assigns a default value to a variable if it has not already been assigned. It can be
+            overridden by subsequent assignments.</li>
+        <li><strong>??=</strong>: Also assigns a default value to a variable, but it is a weaker assignment compared to
+            <code>?=</code>. If multiple assignments are done with this type, the last one takes precedence.
+        </li>
+        <li><strong>=</strong>: A simple variable assignment. Spaces are significant, and quotes are often required.
+            Variables are expanded at the end of the parsing process.</li>
+        <li><strong>:=</strong>: Immediate variable expansion. The value assigned is expanded immediately when the
+            variable is parsed.</li>
+        <li><strong>+=</strong>: Appends a value to a variable, inserting a space between the current value and the
+            appended value. The change takes effect immediately.</li>
+        <li><strong>=+</strong>: Prepends a value to a variable, inserting a space between the current value and the
+            prepended value. The change takes effect immediately.</li>
+        <li><strong>.=</strong>: Appends a value to a variable without adding a space between the current value and the
+            appended value. The change takes effect immediately.</li>
+        <li><strong>=.</strong>: Prepends a value to a variable without adding a space between the current value and the
+            prepended value. The change takes effect immediately.</li>
+        <li><strong>:append</strong>: Appends a value to a variable without adding a space. The effect is applied at
+            variable expansion time rather than immediately.</li>
+        <li><strong>:prepend</strong>: Prepends a value to a variable without adding a space. The effect is applied at
+            variable expansion time rather than immediately.</li>
+        <li><strong>:remove</strong>: Removes specified values from lists. All occurrences of the specified value are
+            removed from the variable.</li>
+    </ul>
 
-<h3>How to Read Variable Values</h3>
-<p>To inspect the value of any variable in the Yocto build system, use the following command:</p>
-<pre><code>bitbake -e &lt;RECIPE_NAME&gt; | grep ^&lt;VARIABLE_NAME&gt;=</code></pre>
-<p>This command exports all environment variables related to the specified recipe and filters the output to display only the desired variable's value.</p>
-<hr>
-<div class="video-frame">
-    <iframe src="https://www.youtube.com/embed/KsU11k5lEX0?si=fdwgkbkco1SRjVFx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</div>
-<h3>Assignment Type <code>?=</code></h3>
-<p>This operator assigns a default value to a variable if it has not already been set. Subsequent assignments with <code>?=</code> are ignored unless the variable was previously unset.</p>
-<pre><code>
+    <h3>How to Read Variable Values</h3>
+    <p>To inspect the value of any variable in the Yocto build system, use the following command:</p>
+    <pre><code>bitbake -e &lt;RECIPE_NAME&gt; | grep ^&lt;VARIABLE_NAME&gt;=</code></pre>
+    <p>This command exports all environment variables related to the specified recipe and filters the output to display
+        only the desired variable's value.</p>
+    <hr>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/KsU11k5lEX0?si=fdwgkbkco1SRjVFx" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h3>Assignment Type <code>?=</code></h3>
+    <p>This operator assigns a default value to a variable if it has not already been set. Subsequent assignments with
+        <code>?=</code> are ignored unless the variable was previously unset.
+    </p>
+    <pre><code>
 TEST ?= "foo"
 TEST ?= "bar"
 TEST ?= "val"
@@ -42,9 +66,10 @@ TEST ?= "var"
 # The final value is TEST="foo"
 </code></pre>
 
-<h3>Assignment Type <code>??=</code></h3>
-<p>This operator performs a weak default assignment. If multiple assignments are made using <code>??=</code>, the last one takes precedence. However, stronger assignments (e.g., <code>?=</code>) override it.</p>
-<pre><code>
+    <h3>Assignment Type <code>??=</code></h3>
+    <p>This operator performs a weak default assignment. If multiple assignments are made using <code>??=</code>, the
+        last one takes precedence. However, stronger assignments (e.g., <code>?=</code>) override it.</p>
+    <pre><code>
 TEST ??= "foo"
 TEST ??= "bar"
 TEST ??= "val"
@@ -58,13 +83,17 @@ TEST ??= "var"
 # The final value is TEST="bar"
 </code></pre>
 
-<hr>
-<div class="video-frame">
-    <iframe  src="https://www.youtube.com/embed/axyktiRLXgs?si=ZzURCh3_eho-y4Z4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</div>
-<h3>Assignment Type <code>=</code></h3>
-<p>This operator performs a simple variable assignment. Variables assigned with <code>=</code> are expanded only after the entire configuration file is parsed.</p>
-<pre><code>
+    <hr>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/axyktiRLXgs?si=ZzURCh3_eho-y4Z4" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h3>Assignment Type <code>=</code></h3>
+    <p>This operator performs a simple variable assignment. Variables assigned with <code>=</code> are expanded only
+        after the entire configuration file is parsed.</p>
+    <pre><code>
 # Override
 A ?= "foo"
 A = "bar"
@@ -77,9 +106,9 @@ A = "bar"
 # The final value is B="bar"
 </code></pre>
 
-<h3>Assignment Type <code>:=</code></h3>
-<p>This operator performs immediate variable expansion. The value is expanded as soon as the variable is parsed.</p>
-<pre><code>
+    <h3>Assignment Type <code>:=</code></h3>
+    <p>This operator performs immediate variable expansion. The value is expanded as soon as the variable is parsed.</p>
+    <pre><code>
 # Override
 A ?= "foo"
 A := "bar"
@@ -92,13 +121,17 @@ A = "bar"
 # The final value is B="foo"
 </code></pre>
 
-<hr>
-<div class="video-frame">
-    <iframe src="https://www.youtube.com/embed/G4qoy1me7fY?si=Ngihdiv6l7tGEpu3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</div>
-<h3>Assignment Types <code>+=</code> and <code>=+</code></h3>
-<p>These operators append or prepend values to a variable, respectively, while inserting a space between the existing value and the new value.</p>
-<pre><code>
+    <hr>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/G4qoy1me7fY?si=Ngihdiv6l7tGEpu3" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h3>Assignment Types <code>+=</code> and <code>=+</code></h3>
+    <p>These operators append or prepend values to a variable, respectively, while inserting a space between the
+        existing value and the new value.</p>
+    <pre><code>
 # Append
 A = "foo"
 A += "bar"
@@ -120,13 +153,18 @@ B =+ "var"
 # The final value is B="var"
 </code></pre>
 
-<hr>
-<div class="video-frame">
-    <iframe src="https://www.youtube.com/embed/hP2zG6icS1Y?si=qw0iLgDMWz7mM3Wr" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</div>
-<h3>Assignment Types <code>.=</code> and <code>=.</code></h3>
-<p>These operators append or prepend values to a variable without adding a space. Unlike <code>+=</code> and <code>=+</code>, these operators require you to manually manage spaces if needed.</p>
-<pre><code>
+    <hr>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/hP2zG6icS1Y?si=qw0iLgDMWz7mM3Wr" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h3>Assignment Types <code>.=</code> and <code>=.</code></h3>
+    <p>These operators append or prepend values to a variable without adding a space. Unlike <code>+=</code> and
+        <code>=+</code>, these operators require you to manually manage spaces if needed.
+    </p>
+    <pre><code>
 # Append
 A = "foo"
 A .= "bar"
@@ -138,13 +176,17 @@ B =. "bar"
 # The final value is B="barfoo"
 </code></pre>
 
-<hr>
-<div class="video-frame">
-    <iframe  src="https://www.youtube.com/embed/U4QRXAO4AfA?si=o-6aPjunrc8oO8Lv" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</div>
-<h3>Assignment Types <code>:append</code>, <code>:prepend</code>, and <code>:remove</code></h3>
-<p>These operators modify variables at the time of variable expansion rather than immediately. They are particularly useful for managing lists or strings in recipes.</p>
-<pre><code>
+    <hr>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/U4QRXAO4AfA?si=o-6aPjunrc8oO8Lv" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h3>Assignment Types <code>:append</code>, <code>:prepend</code>, and <code>:remove</code></h3>
+    <p>These operators modify variables at the time of variable expansion rather than immediately. They are particularly
+        useful for managing lists or strings in recipes.</p>
+    <pre><code>
 # Append
 A = "foo"
 A:append = "bar"
@@ -183,8 +225,16 @@ A += "var"
 # The final value is A=" foo bar var"
 </code></pre>
 
-<h3>Conclusion</h3>
-<p>In this tutorial, we explored the various types of variable assignments used in the Yocto build system. Each assignment type serves a specific purpose, allowing developers to define, modify, and expand variables with precision
+    <h3>Conclusion</h3>
+    <p>In this tutorial, we explored the various types of variable assignments used in the Yocto build system. Each
+        assignment type serves a specific purpose, allowing developers to define, modify, and expand variables with
+        precision
+    </p>
 
-</p>
+    <h3>Reference Link</h3>
+    <ul>
+        <li>
+        <a href="https://docs.yoctoproject.org/bitbake/singleindex.html#syntax-and-operators">Variable Syntax and Operators</a>
+        </li>
+    </ul>
 </section>

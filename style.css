@@ -67,6 +67,15 @@ p a::after {
     color: var(--sec-clr);
 }
 
+.error {
+    background-color: var(--code-clr);
+    color: red;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--sec-clr);
+    margin-block: 5px;
+}
+
 /* Sidebar Styling */
 .sidebar {
     width: 250px;
