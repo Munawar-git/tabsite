@@ -50,12 +50,12 @@ function loadHTML(file, targetElement) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    loadHTML("about_page.htm", "content_area");
+    loadHTML("home.htm", "content_area");
 });
 
 // Loading HTML on click on topic
 document.getElementById("tab-icon").addEventListener("click", function () {
-    loadHTML("about_page.htm", "content_area");
+    loadHTML("home.htm", "content_area");
 });
 
 document.getElementById("00").addEventListener("click", function () {
@@ -104,4 +104,7 @@ document.getElementById("10").addEventListener("click", function () {
 
 document.getElementById("11").addEventListener("click", function () {
     loadHTML("11_rdepends.htm", "content_area");
+});
+document.getElementById("12").addEventListener("click", function () {
+    loadHTML("12_rprovides.htm", "content_area");
 });
