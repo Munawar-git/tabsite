@@ -1,0 +1,180 @@
+<section class="chapter 12" id="12_rprovides">
+    <h2>13# Managing Conflicts with RCONFLICTS</h2>
+    <div class="video-frame">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/PT51np3hxzs?si=A36a2R7v3oedc2i3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
+    <p>In this tutorial, we will explore the RCONFLICTS variable in the Yocto Project
+        and understand its role in preventing runtime conflicts between packages. This feature is essential for
+        maintaining system stability by ensuring that incompatible packages are not installed together.</p>
+
+    <h3>What is RCONFLICTS?</h3>
+    <p>In the Yocto Project, RCONFLICTS is a variable used to specify package conflicts at runtime. It ensures that
+        two or more packages that cannot coexist on the target system due to conflicting functionality or files are not
+        installed simultaneously. For example, if two packages provide the same executable or service, installing both
+        could lead to runtime issues.</p>
+
+
+    <h3>Why Use RCONFLICTS?</h3>
+    <ul>
+        <li><strong>Prevent Runtime Conflicts:</strong> Ensures that incompatible packages are not installed together,
+            avoiding potential conflicts at runtime.</li>
+        <li><strong>System Stability:</strong> Helps maintain a stable system by preventing the installation of
+            conflicting packages, which could otherwise cause instability or failure.</li>
+        <li><strong>Clear Dependencies:</strong> Provides clear instructions to the package manager (e.g., `rpm`, `ipk`,
+            or `deb`) about which packages cannot coexist, enabling it to enforce these rules during installation.</li>
+    </ul>
+
+    <h3>How to Use RCONFLICTS?</h3>
+    <p>The RCONFLICTS variable is defined in a recipe (`.bb` file) and specifies a list of packages that conflict with
+        the current package. The syntax is as follows:</p>
+    <pre><code>RCONFLICTS:${PN} = "conflicting-package-name"</code></pre>
+    <ul>
+        <li><code>${PN}</code>: Refers to the package name of the current recipe.</li>
+        <li><code>conflicting-package-name</code>: Specifies the name of the package that conflicts with the current
+            package.</li>
+    </ul>
+
+    <h3>Example of RCONFLICTS</h3>
+
+    <p>Suppose you have two recipes, `rconflicts-example` and `rconflicts-example2`, both of which install a
+        `helloWorld.sh` script. Since only one version of this script can run on the system at a time, you want to
+        ensure that these two packages cannot be installed simultaneously.</p>
+
+    <h4>Recipe 1: `rconflicts-example.bb`</h4>
+    <pre><code>SUMMARY = "Copies bash script in /usr/bin"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://helloWorld.sh"
+S = "${WORKDIR}"
+
+# Specify runtime dependencies
+RDEPENDS:${PN} = "bash"
+
+# Specify runtime conflicts
+RCONFLICTS:${PN} = "rconflicts-example2"
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/helloWorld.sh ${D}${bindir}/
+}</code></pre>
+
+    <h4>Recipe 2: `rconflicts-example2.bb`</h4>
+    <pre><code>SUMMARY = "Copies bash script in /usr/bin"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://helloWorld.sh"
+S = "${WORKDIR}"
+
+# Specify runtime dependencies
+RDEPENDS:${PN} = "bash"
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/helloWorld.sh ${D}${bindir}/
+}</code></pre>
+
+    <p>If you attempt to install both `rconflicts-example` and `rconflicts-example2` on the same system, the package
+        manager will detect the conflict (as specified by RCONFLICTS) and prevent the installation of the second
+        package.</p>
+
+    
+
+    <h3>RCONFLICTS with Recipe Version</h3>
+
+    <p>You can also specify version constraints with the RCONFLICTS variable using the following syntax:</p>
+    <pre><code>RCONFLICTS:${PN} = "package (operator version)"</code></pre>
+
+    <p>For `operator`, you can use the following symbols:</p>
+    <ul>
+        <li>= (Exact version)</li>
+        <li>
+            < (Less than)</li>
+        <li>> (Greater than)</li>
+        <li>
+            <= (Less than or equal to)</li>
+        <li>>= (Greater than or equal to)</li>
+    </ul>
+
+    <p>In the following example, only versions greater than or equal to `1.2` of `rconflicts-example2` will conflict
+        with `rconflicts-example`:</p>
+
+    <h4>Recipe 1: `rconflicts-example.bb`</h4>
+    <pre><code>SUMMARY = "Copies bash script in /usr/bin"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://helloWorld.sh"
+S = "${WORKDIR}"
+
+# Specify runtime dependencies
+RDEPENDS:${PN} = "bash"
+
+# Specify runtime conflicts with version constraint
+RCONFLICTS:${PN} = "rconflicts-example2 (>= 1.2)"
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/helloWorld.sh ${D}${bindir}/
+}</code></pre>
+
+    <h4>Recipe 2: `rconflicts-example2_1.2.bb`</h4>
+    <pre><code>SUMMARY = "Copies bash script in /usr/bin"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://helloWorld.sh"
+S = "${WORKDIR}"
+
+# Specify runtime dependencies
+RDEPENDS:${PN} = "bash"
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/helloWorld.sh ${D}${bindir}/
+}</code></pre>
+
+    <div class="note">
+        <p><strong>Note:</strong> The conflicting package's name (`rconflicts-example2`) must match exactly as it
+            appears in the recipe's `PN` (package name) variable. Additionally, if version constraints are used, the
+            recipe name must include the version number (e.g., `rconflicts-example2_1.2.bb`).</p>
+    </div>
+
+    
+
+    <h3>Key Points About RCONFLICTS</h3>
+    <ul>
+        <li><strong>Runtime Enforcement:</strong> RCONFLICTS is enforced at runtime by the package manager (e.g.,
+            `opkg`, `rpm`, or `dpkg`). It does not affect the build process.</li>
+        <li><strong>Package Names:</strong> The conflicting package names must match exactly as they appear in the
+            recipe's `PN` (package name) variable.</li>
+        <li><strong>Multiple Conflicts:</strong> You can specify multiple conflicting packages by separating them with
+            spaces:
+            <pre><code>RCONFLICTS:${PN} = "package1 package2 package3"</code></pre>
+        </li>
+        <li><strong>Use Cases:</strong> Common scenarios where RCONFLICTS is useful include:
+            <ul>
+                <li>Conflicting web servers (e.g., Apache vs. Nginx).</li>
+                <li>Conflicting init systems (e.g., systemd vs. SysVinit).</li>
+                <li>Conflicting libraries or tools that provide the same functionality.</li>
+            </ul>
+        </li>
+    </ul>
+
+    
+
+    <h4>Conclusion</h4>
+    <p>RCONFLICTS is a powerful mechanism in Yocto for preventing runtime conflicts between packages. By explicitly
+        declaring conflicts, you can ensure that incompatible packages are not installed together, thereby maintaining
+        system stability and avoiding runtime errors. Use RCONFLICTS whenever two or more packages provide conflicting
+        functionality or files. In the next video, we will explore additional features of Yocto's dependency management
+        system.</p>
+
+    <h4>Reference Links</h4>
+    <ul>
+        <li><a href="https://docs.yoctoproject.org/ref-manual/variables.html#term-RCONFLICTS" target="_blank">Yocto RCONFLICTS Variable</a></li>
+    </ul>
+
+</section>
