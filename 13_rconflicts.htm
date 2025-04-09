@@ -1,7 +1,10 @@
 <section class="chapter 12" id="12_rprovides">
     <h2>13# Managing Conflicts with RCONFLICTS</h2>
     <div class="video-frame">
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/PT51np3hxzs?si=A36a2R7v3oedc2i3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/PT51np3hxzs?si=A36a2R7v3oedc2i3"
+            title="YouTube video player" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </div>
 
     <p>In this tutorial, we will explore the RCONFLICTS variable in the Yocto Project
@@ -36,7 +39,14 @@
     </ul>
 
     <h3>Example of RCONFLICTS</h3>
-
+    <h4>Folder Structure</h4>
+    <p>Create the following folder structure inside your layer (e.g., meta-tab-layer):</p>
+    <pre><code>recipes-example/rconflicts-example/
+├── files
+│   └── helloWorld.sh
+├── rconflicts-example.bb
+├── rconflicts-example2_1.2.bb
+└── rconflicts-example2.bb</code></pre>
     <p>Suppose you have two recipes, `rconflicts-example` and `rconflicts-example2`, both of which install a
         `helloWorld.sh` script. Since only one version of this script can run on the system at a time, you want to
         ensure that these two packages cannot be installed simultaneously.</p>
@@ -75,13 +85,39 @@ do_install() {
     install -d ${D}${bindir}
     install -m 0755 ${S}/helloWorld.sh ${D}${bindir}/
 }</code></pre>
+    <h4>Adding Recipes to Image</h4>
+    <p>Add the following lines to local.conf file</p>
+    <pre><code>IMAGE_INSTALL:append = " rconflicts-example"
+IMAGE_INSTALL:append = " rconflicts-example2"
+</code></pre>
 
+    <h4>Building the Image</h4>
+    <ul>
+        <li>Navigate to the poky folder and source the environment:
+            <pre><code>cd /path/to/poky
+source oe-init-build-env</code></pre>
+        </li>
+        <li>Build the image:
+            <pre><code>bitbake core-image-full-cmdline</code></pre>
+        </li>
+    </ul>
     <p>If you attempt to install both `rconflicts-example` and `rconflicts-example2` on the same system, the package
         manager will detect the conflict (as specified by RCONFLICTS) and prevent the installation of the second
         package.</p>
-
-    
-
+    <div class="error">
+        <p><strong>Error:</strong></p>
+        <p><strong>Problem:</strong> package rconflicts-example-1.0-r0.cortexa7t2hf_neon_vfpv4 conflicts with
+            rconflicts-example2 provided by rconflicts-example2-1.0-r0.cortexa7t2hf_neon_vfpv4</p>
+        <p> - conflicting requests</p>
+        <p>(try to add '--allowerasing' to command line to replace conflicting packages or '--skip-broken' to skip
+            uninstallable packages)</p>
+        <p><strong>ERROR:</strong> Logfile of failure stored in:
+            /home/munawar/YoctoTuitorial/sources/tmp/work/raspberrypi4-poky-linux-gnueabi/core-image-full-cmdline/1.0-r0/temp/log.do_rootfs.18103
+        </p>
+        <p><strong>ERROR:</strong> Task
+            (/home/munawar/YoctoTuitorial/poky/meta/recipes-extended/images/core-image-full-cmdline.bb:do_rootfs) failed
+            with exit code '1'</p>
+    </div>
     <h3>RCONFLICTS with Recipe Version</h3>
 
     <p>You can also specify version constraints with the RCONFLICTS variable using the following syntax:</p>
@@ -142,7 +178,7 @@ do_install() {
             recipe name must include the version number (e.g., `rconflicts-example2_1.2.bb`).</p>
     </div>
 
-    
+
 
     <h3>Key Points About RCONFLICTS</h3>
     <ul>
@@ -163,7 +199,7 @@ do_install() {
         </li>
     </ul>
 
-    
+
 
     <h3>Conclusion</h3>
     <p>RCONFLICTS is a powerful mechanism in Yocto for preventing runtime conflicts between packages. By explicitly
@@ -174,7 +210,8 @@ do_install() {
 
     <h3>Reference Links</h3>
     <ul>
-        <li><a href="https://docs.yoctoproject.org/ref-manual/variables.html#term-RCONFLICTS" target="_blank">Yocto RCONFLICTS Variable</a></li>
+        <li><a href="https://docs.yoctoproject.org/ref-manual/variables.html#term-RCONFLICTS" target="_blank">Yocto
+                RCONFLICTS Variable</a></li>
     </ul>
 
 </section>
