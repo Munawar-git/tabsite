@@ -1,0 +1,261 @@
+<section class="chapter 14" id="14_depends">
+    <h2>14# Build-Time Dependencies with DEPENDS</h2>
+    <div class="video-collection">
+        <div class="video-frame">
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/mF-VpN6Rc88?si=uIZJakR2lM6jCNY0"
+                title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <div class="video-frame">
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/ycbQYm1s37s?si=TN0nwYRiZeqj4AiQ"
+                title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+    </div>
+    <p> In this tutorial, we will explore the DEPENDS variable in the Yocto Project and
+        understand its role in specifying build-time dependencies for recipes. By mastering DEPENDS, you can ensure
+        that all required packages, libraries, and tools are available during the compilation process, preventing build
+        failures and ensuring smooth development.</p>
+
+    <h3>What is DEPENDS?</h3>
+    <p>In the Yocto Project, DEPENDS is a critical variable used to specify **build-time dependencies** for a recipe.
+        It ensures that the required packages or tools are built and available before the current recipe starts
+        compiling. Unlike runtime dependencies (`RDEPENDS`), DEPENDS is enforced during the **build phase**.</p>
+
+    <h3>Why Use DEPENDS?</h3>
+    <ul>
+        <li><strong>Ensures Correct Build Order:</strong> If Recipe A depends on libraries or headers from Recipe B,
+            DEPENDS guarantees that Recipe B is built first.</li>
+        <li><strong>Prevents Missing Dependency Errors:</strong> Avoids compilation failures caused by missing headers,
+            libraries, or tools.</li>
+        <li><strong>Supports Cross-Compilation:</strong> Helps manage dependencies for both native (`-native`) and
+            target packages.</li>
+    </ul>
+
+    <h3>How to Use DEPENDS?</h3>
+
+    <p>The DEPENDS variable is defined in the recipe file (`.bb`) and specifies a space-separated list of build-time
+        dependencies. The syntax is:</p>
+    <pre><code>DEPENDS = "package1 package2 package3"</code></pre>
+
+    <p>Dependencies can include:</p>
+    <ul>
+        <li>Other Yocto recipes (e.g., `libssl`, `zlib`).</li>
+        <li>Host tools needed for compilation (e.g., `cmake-native`, `autoconf-native`).</li>
+    </ul>
+
+    <h3>Example 1: Simple Addition Program Without DEPENDS</h3>
+
+    <p>Let's start with an example where we build a simple program (`add.c`) that uses an external function from another
+        source file (`math_lib.c`). Initially, we'll build it without using DEPENDS.</p>
+
+    <h4>Folder Structure</h4>
+    <p>Create the following folder structure inside your layer (e.g., meta-tab-layer):</p>
+    <pre><code>recipes-example/depends-example/
+    ├── files
+    │   ├── add.c
+    │   ├── math-lib.c
+    └── add.bb</code></pre>
+    <img src="./14_depends_image.png" alt="Simple Addition Example">
+
+    <h4>Sources</h4>
+    <p><strong>add.c:</strong></p>
+    <pre><code>#include <stdio.h>
+
+extern int add(int a, int b);
+
+int main() {
+    int num1 = 10;
+    int num2 = 5;
+
+    printf("Addition: %d\n", add(num1, num2));
+    return 0;
+}</code></pre>
+
+    <p><strong>math_lib.c:</strong></p>
+    <pre><code>#include &lt;stdio.h&gt;
+
+int add(int a, int b) {
+    return a + b;
+}
+
+int subtract(int a, int b) {
+    return a - b;
+}</code></pre>
+
+    <h4>Recipe (add.bb)</h4>
+    <pre><code>SUMMARY = "Math library for basic arithmetic operations"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://math-lib.c \
+           file://add.c"
+
+S = "${WORKDIR}"
+
+do_compile() {
+    ${CC} ${CFLAGS} -c math-lib.c -o math-lib.o
+#   Creating static library    
+    ar rcs libmath.a math-lib.o 
+    
+    ${CC} ${CFLAGS} -c add.c -o add_inter.o
+    ${CC} ${CFLAGS} ${LDFLAGS} math-lib.o add_inter.o -o add -Wl,--hash-style=gnu
+}
+
+do_install() {
+    install -d ${D}${libdir}
+    install -m 0644 libmath.a ${D}${libdir}
+
+    install -d ${D}${bindir}
+    install -m 0755 add ${D}${bindir}
+}
+
+FILES:${PN} += "${libdir}/libmath.a"</code></pre>
+
+    <p>To include this recipe in your image, add the following line to your `local.conf` file:</p>
+    <pre><code>IMAGE_INSTALL:append = " add"</code></pre>
+
+    <p>Build the image as follows:</p>
+    <pre><code>cd /path/to/poky
+source oe-init-build-env
+bitbake core-image-full-cmdline</code></pre>
+
+    <p>After building, flash the image to your BeagleBone Black (BBB) or run it in QEMU to test the final binary.</p>
+
+    <h3>Example 2: Using DEPENDS for a Calculator Application</h3>
+
+    <p>Now, let's expand our example by creating a calculator application (`calculator.c`) that uses the addition and
+        subtraction functions from the previously created `libmath.a` static library. To ensure that the `add.bb` recipe
+        is built first, we use the DEPENDS variable in the `calculator.bb` recipe.</p>
+
+    <h4>Folder Structure</h4>
+    <p>Create the following folder structure inside your layer (e.g., meta-tab-layer):</p>
+    <pre><code>recipes-example/depends-example/
+    ├── files
+    │   ├── add.c
+    │   ├── math-lib.c
+    │   └── calculator.c
+    ├── add.bb
+    └── calculator.bb</code></pre>
+    <img src="./14_depends_calculator.png" alt="Calculator Example">
+
+    <h4>Sources</h4>
+    <p><strong>calculator.c:</strong></p>
+    <pre><code>#include &lt;stdio.h&gt;
+
+extern int add(int a, int b);
+extern int subtract(int a, int b);
+
+int main() {
+    int num1 = 55;
+    int num2 = 9;
+
+    printf("Addition: %d\n", add(num1, num2));
+    printf("Subtraction: %d\n", subtract(num1, num2));
+
+    return 0;
+}</code></pre>
+
+
+    <h4>Recipe (calculator.bb)</h4>
+    <pre><code>SUMMARY = "Simple calculator application"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+DEPENDS = "add"
+
+SRC_URI = "file://calculator.c"
+
+S = "${WORKDIR}"
+
+do_compile() {
+    ${CC} ${CFLAGS} ${LDFLAGS} calculator.c -o calculator -L${STAGING_LIBDIR} -lmath -Wl,--hash-style=gnu
+}
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 calculator ${D}${bindir}
+}</code></pre>
+
+    <p><strong>Key Points:</strong></p>
+    <ul>
+        <li>The `DEPENDS = "add"` line ensures that the `add.bb` recipe (which provides `libmath.a`) is built first.
+        </li>
+        <li>In the `do_compile` task, `-L${STAGING_LIBDIR}` specifies the location of the static library (`libmath.a`),
+            and `-lmath` links against it.</li>
+    </ul>
+
+    <p>Add the following line to your `local.conf` file to include the calculator in your image:</p>
+    <pre><code>IMAGE_INSTALL:append = " calculator"</code></pre>
+
+    <p>Build the image as follows:</p>
+    <pre><code>cd /path/to/poky
+source oe-init-build-env
+bitbake core-image-full-cmdline</code></pre>
+
+    <p>After building, flash the image to your BBB or run it in QEMU to test the final binary.</p>
+
+    <h3>Native Dependencies</h3>
+
+    <p>If your recipe requires a **host tool** (e.g., `cmake` or `python3-native`) during the build process, you can
+        specify it in the DEPENDS variable with the `-native` suffix.</p>
+
+    <h4>Example: Using CMake</h4>
+    <p>Suppose you have a recipe (`myapp.bb`) that uses `CMake` for building. You would define the dependency as
+        follows:</p>
+    <pre><code>DEPENDS = "curl cmake-native"</code></pre>
+    <p>This ensures that `cmake` (a host tool) is available during the build process.</p>
+
+
+
+    <h3>Key Differences: DEPENDS vs RDEPENDS</h3>
+
+    <p>Understanding the difference between DEPENDS and RDEPENDS is essential for managing dependencies effectively:
+    </p>
+
+    <table>
+        <tr>
+            <th>Feature</th>
+            <th>DEPENDS</th>
+            <th>RDEPENDS</th>
+        </tr>
+        <tr>
+            <td>Phase</td>
+            <td>Build-time</td>
+            <td>Runtime (after installation)</td>
+        </tr>
+        <tr>
+            <td>Purpose</td>
+            <td>Needed for compilation</td>
+            <td>Needed for execution on the target system</td>
+        </tr>
+        <tr>
+            <td>Example</td>
+            <td><code>DEPENDS = "libssl"</code></td>
+            <td><code>RDEPENDS = "libssl"</code></td>
+        </tr>
+        <tr>
+            <td>Native Tools</td>
+            <td><code>DEPENDS = "cmake-native"</code> (OK)</td>
+            <td>RDEPENDS does not support `-native`</td>
+        </tr>
+    </table>
+
+    <h3>Conclusion</h3>
+    <p>DEPENDS is a crucial variable in the Yocto Project for specifying **build-time dependencies**. It ensures that
+        all required packages, libraries, and tools are available during the compilation process, preventing build
+        failures and maintaining a smooth workflow. Use DEPENDS for libraries, headers, and host tools needed during
+        compilation, and reserve RDEPENDS for runtime dependencies.</p>
+
+    <p>In the next video, we will explore advanced dependency management techniques in Yocto. Stay tuned!</p>
+
+    <h3>Reference Links</h3>
+    <ul>
+        <li><a href="https://docs.yoctoproject.org/ref-manual/variables.html#term-DEPENDS" target="_blank">Yocto DEPENDS
+                Variable
+                Documentation</a></li>
+    </ul>
+
+</section>

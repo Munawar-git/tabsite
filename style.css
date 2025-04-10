@@ -1,4 +1,3 @@
-
 /* Root Variables */
 :root {
     --main-clr: #333333;
@@ -67,6 +66,22 @@ p a::after {
     color: var(--sec-clr);
 }
 
+table {
+    font-size: 1.1rem;
+    text-align: center;
+    border: #bbbbbb 2px solid;
+}
+
+td {
+    padding-inline: 0.75rem;
+    border-top: #bbbbbb 1px solid;
+    border-right: #bbbbbb 1px solid;
+}
+
+td:last-of-type {
+    border-right: none;
+}
+
 .error {
     background-color: var(--code-clr);
     color: red;
@@ -95,7 +110,7 @@ p a::after {
     justify-content: center;
 }
 
-.sidebar #tab-icon img{
+.sidebar #tab-icon img {
     width: 100px;
     border-radius: 10px;
 }
@@ -163,11 +178,10 @@ p a::after {
     margin-bottom: 30px;
 }
 
-.main-content header h2{
+.main-content header h2 {
     color: var(--pri-clr);
     background: none;
     font-size: 3.5rem;
-
 }
 
 .main-content h1 {
@@ -210,17 +224,16 @@ p a::after {
 }
 
 /* Chapter Specific Styles */
-.chapter.about h2{
+.chapter.about h2 {
     background: none;
     color: var(--pri-clr);
     text-align: center;
 }
 
-.chapter.about h3{
+.chapter.about h3 {
     background: none;
     color: var(--pri-clr);
     text-align: center;
-
 }
 
 .chapter ul {
@@ -232,19 +245,23 @@ p a::after {
     padding-left: 5px;
 }
 
-.video-frame{
+.video-frame {
     margin-block: 1rem;
     display: flex;
     justify-content: center;
 }
-.video-frame iframe{
-    border: solid 2px var(--sec-clr); 
+.video-collection {
+    display: flex;
+    justify-content: space-around;
+}
+.video-frame iframe {
+    border: solid 2px var(--sec-clr);
     border-radius: 20px;
     height: 365px;
     width: 650px;
 }
 
-.recipe p{
+.recipe p {
     margin-top: 1.2rem;
 }
 
@@ -252,21 +269,20 @@ p a::after {
 ::-webkit-scrollbar {
     width: 18px; /* Width of the scrollbar */
     padding: 4px;
-  }
-  
-  ::-webkit-scrollbar-track {
+}
+
+::-webkit-scrollbar-track {
     background: var(--pri-clr); /* Color of the track */
-  }
-  
-  ::-webkit-scrollbar-thumb {
+}
+
+::-webkit-scrollbar-thumb {
     background: var(--main-clr); /* Color of the scroll thumb */
     border-radius: 20px; /* Rounded corners for the thumb */
     border: 2px solid var(--sec-clr); /* Border around the thumb */
-  }
-  
-  /* Scrollbar styling for Firefox */
-  * {
+}
+
+/* Scrollbar styling for Firefox */
+* {
     scrollbar-width: thin; /* "auto" or "thin" for Firefox */
     scrollbar-color: var(--main-clr) var(--pri-clr); /* Thumb and track color */
-  }
-  
+}
