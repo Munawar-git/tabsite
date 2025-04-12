@@ -181,7 +181,7 @@ td:last-of-type {
 .main-content header h2 {
     color: var(--pri-clr);
     background: none;
-    font-size: 3.5rem;
+    /* font-size: 3.5rem; */
 }
 
 .main-content h1 {
@@ -190,25 +190,11 @@ td:last-of-type {
 }
 
 .main-content h2 {
-    font-size: 2.3rem;
+    font-size: 3.5rem;
     margin-bottom: 10px;
     padding-left: 5px;
     background: linear-gradient(var(--h1-gradient));
     color: var(--main-clr);
-}
-
-.main-content h3 {
-    font-size: 1.7rem;
-    color: var(--pri-clr);
-    padding-left: 5px;
-    margin-block: 10px;
-}
-
-.main-content h4 {
-    margin-top: 10px;
-    padding-left: 5px;
-    font-size: 1.2rem;
-    color: var(--pri-clr);
 }
 
 .main-content p {
@@ -223,11 +209,30 @@ td:last-of-type {
     box-shadow: 0 4px 6px rgba(0, 255, 128, 0.3);
 }
 
+
 /* Chapter Specific Styles */
+.chapter h2{
+    font-size: 2.3rem !important;
+}
+
+.chapter h3 {
+    font-size: 1.7rem;
+    color: var(--pri-clr);
+    padding-left: 5px;
+    margin-block: 10px;
+}
+
+.chapter h4 {
+    font-size: 1.2rem;
+    margin-top: 10px;
+    padding-left: 5px;
+    color: var(--pri-clr);
+}
 .chapter.about h2 {
     background: none;
     color: var(--pri-clr);
     text-align: center;
+
 }
 
 .chapter.about h3 {
@@ -250,15 +255,12 @@ td:last-of-type {
     display: flex;
     justify-content: center;
 }
-.video-collection {
-    display: flex;
-    justify-content: space-around;
-}
+
 .video-frame iframe {
     border: solid 2px var(--sec-clr);
     border-radius: 20px;
-    height: 365px;
     width: 650px;
+    aspect-ratio: 1.8;
 }
 
 .recipe p {
@@ -285,4 +287,88 @@ td:last-of-type {
 * {
     scrollbar-width: thin; /* "auto" or "thin" for Firefox */
     scrollbar-color: var(--main-clr) var(--pri-clr); /* Thumb and track color */
+}
+
+
+@media (max-width: 750px){
+    .main-content h1{
+        font-size: 3.5rem ;
+    }
+    .main-content h2 {
+        font-size: 3.0rem ;
+    }
+    .main-content {
+        margin: 30px;
+    }
+    .main-content p {
+        font-size: 0.9rem;
+    }
+    .chapter h2{
+        font-size: 2.0rem !important;
+    }
+    .chapter h3 {
+        font-size: 1.5rem;
+    }
+    .chapter h4 {
+        font-size: 1.1rem;
+    }
+    .chapter ul {
+        font-size: 0.9rem;
+    }
+}
+
+
+@media (max-width: 500px){
+    .main-content h1{
+        font-size: 2.7rem ;
+    }
+    .main-content h2 {
+        font-size: 2.5rem ;
+    }
+    .main-content p {
+        font-size: 0.85rem;
+    }
+    .main-content {
+        margin: 20px;
+    }
+    .chapter h2{
+        font-size: 1.7rem !important;
+    }
+    .chapter h3 {
+        font-size: 1.35rem;
+    }
+    .chapter h4 {
+        font-size: 1.0rem;
+    }
+    .chapter ul {
+        font-size: 0.85rem;
+    }
+}
+
+
+@media (max-width: 450px){
+    .main-content h1{
+        font-size: 2.2rem ;
+    }
+    .main-content h2 {
+        font-size: 2.0rem ;
+    }
+    .main-content {
+        margin: 5px;
+    }
+    .main-content p {
+        font-size: 0.8rem;
+    }
+    .chapter h2{
+        font-size: 1.3rem !important;
+    }
+    .chapter h3 {
+        font-size: 1.15rem;
+    }
+    .chapter h4 {
+        font-size: 0.95rem;
+    }
+    .chapter ul {
+        font-size: 0.8rem;
+    }
 }
