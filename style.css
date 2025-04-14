@@ -16,9 +16,10 @@
 
 /* Body Styling */
 body {
-    font-family: monospace;
+    min-width: 350px;
     background-color: var(--main-clr);
     color: var(--sec-clr);
+    font-family: monospace;
     line-height: 1.6;
 }
 
@@ -27,13 +28,13 @@ hr {
 }
 /* Typography & Elements */
 pre {
+    margin-block: 5px;
+    padding: 5px 10px;
+    border: 1px solid var(--sec-clr);
+    border-radius: 5px;
     background-color: var(--code-clr);
     color: var(--pri-clr);
-    padding: 5px 10px;
-    border-radius: 5px;
-    border: 1px solid var(--sec-clr);
     overflow-x: auto;
-    margin-block: 5px;
 }
 
 img {
@@ -67,9 +68,9 @@ p a::after {
 }
 
 table {
-    font-size: 1.1rem;
-    text-align: center;
     border: #bbbbbb 2px solid;
+    text-align: center;
+    font-size: 1.1rem;
 }
 
 td {
@@ -83,25 +84,26 @@ td:last-of-type {
 }
 
 .error {
+    margin-block: 5px;
+    padding: 5px 10px;
+    border: 1px solid var(--sec-clr);
+    border-radius: 5px;
     background-color: var(--code-clr);
     color: red;
-    padding: 5px 10px;
-    border-radius: 5px;
-    border: 1px solid var(--sec-clr);
-    margin-block: 5px;
+    overflow-x: auto;
 }
 
 /* Sidebar Styling */
 .sidebar {
-    width: 250px;
-    height: 100vh;
     position: fixed;
     top: 0;
     left: -250px; /* Initially hidden */
-    background-color: var(--pri-clr);
-    transition: left 0.3s ease;
-    overflow-y: auto;
+    width: 250px;
+    height: 100%;
     padding: 20px;
+    background-color: var(--pri-clr);
+    overflow-y: auto;
+    transition: left 0.3s ease;
 }
 
 .sidebar #tab-icon {
@@ -117,8 +119,8 @@ td:last-of-type {
 
 .sidebar h2 {
     margin-bottom: 20px;
-    font-size: 1.5rem;
     color: var(--main-clr);
+    font-size: 1.5rem;
 }
 
 .sidebar ul {
@@ -128,10 +130,10 @@ td:last-of-type {
 .sidebar li a {
     display: block;
     padding: 10px;
-    font-size: 1rem;
-    text-decoration: none;
-    color: var(--main-clr);
     border-radius: 10px;
+    color: var(--main-clr);
+    text-decoration: none;
+    font-size: 1rem;
     transition: background-color 0.3s ease;
 }
 
@@ -141,8 +143,8 @@ td:last-of-type {
 }
 
 #home-icon {
-    font-size: 2rem;
     text-align: center;
+    font-size: 2rem;
 }
 
 /* Sidebar Toggle Button */
@@ -150,16 +152,16 @@ td:last-of-type {
     position: fixed;
     top: 50%;
     left: -10px;
+    z-index: 1000;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--pri-clr);
+    color: var(--main-clr);
+    cursor: pointer;
+    font-size: 2rem;
     transform: translateY(-50%);
     transition: left 0.3s ease;
-    background-color: var(--pri-clr);
-    border: none;
-    color: var(--main-clr);
-    font-size: 2rem;
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 5px;
-    z-index: 1000;
 }
 
 .toggle-button:hover {
@@ -174,27 +176,26 @@ td:last-of-type {
 }
 
 .main-content header {
-    text-align: center;
     margin-bottom: 30px;
+    text-align: center;
 }
 
 .main-content header h2 {
-    color: var(--pri-clr);
     background: none;
-    /* font-size: 3.5rem; */
+    color: var(--pri-clr);
 }
 
 .main-content h1 {
-    font-size: 4.5rem;
     color: var(--pri-clr);
+    font-size: 4.5rem;
 }
 
 .main-content h2 {
-    font-size: 3.5rem;
     margin-bottom: 10px;
     padding-left: 5px;
     background: linear-gradient(var(--h1-gradient));
     color: var(--main-clr);
+    font-size: 3.5rem;
 }
 
 .main-content p {
@@ -204,9 +205,9 @@ td:last-of-type {
 .main-content section {
     margin-bottom: 40px;
     padding: 20px;
-    background-color: var(--main-clr);
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 255, 128, 0.3);
+    background-color: var(--main-clr);
 }
 
 
@@ -216,23 +217,23 @@ td:last-of-type {
 }
 
 .chapter h3 {
-    font-size: 1.7rem;
-    color: var(--pri-clr);
-    padding-left: 5px;
     margin-block: 10px;
+    padding-left: 5px;
+    color: var(--pri-clr);
+    font-size: 1.7rem;
 }
 
 .chapter h4 {
-    font-size: 1.2rem;
     margin-top: 10px;
     padding-left: 5px;
     color: var(--pri-clr);
+    font-size: 1.2rem;
 }
+
 .chapter.about h2 {
     background: none;
     color: var(--pri-clr);
     text-align: center;
-
 }
 
 .chapter.about h3 {
@@ -257,10 +258,10 @@ td:last-of-type {
 }
 
 .video-frame iframe {
-    border: solid 2px var(--sec-clr);
-    border-radius: 20px;
     width: 650px;
     aspect-ratio: 1.8;
+    border: solid 2px var(--sec-clr);
+    border-radius: 20px;
 }
 
 .recipe p {
@@ -291,14 +292,17 @@ td:last-of-type {
 
 
 @media (max-width: 750px){
+    table {
+        font-size: 0.9rem;
+    }
+    .main-content {
+        margin: 30px;
+    }
     .main-content h1{
         font-size: 3.5rem ;
     }
     .main-content h2 {
         font-size: 3.0rem ;
-    }
-    .main-content {
-        margin: 30px;
     }
     .main-content p {
         font-size: 0.9rem;
@@ -319,6 +323,12 @@ td:last-of-type {
 
 
 @media (max-width: 500px){
+    table {
+        font-size: 0.75rem;
+    }
+    .main-content {
+        margin: 20px;
+    }
     .main-content h1{
         font-size: 2.7rem ;
     }
@@ -327,9 +337,6 @@ td:last-of-type {
     }
     .main-content p {
         font-size: 0.85rem;
-    }
-    .main-content {
-        margin: 20px;
     }
     .chapter h2{
         font-size: 1.7rem !important;
@@ -345,16 +352,18 @@ td:last-of-type {
     }
 }
 
-
 @media (max-width: 450px){
+    table {
+        font-size: 0.6rem;
+    }
+    .main-content {
+        margin: 5px;
+    }
     .main-content h1{
         font-size: 2.2rem ;
     }
     .main-content h2 {
         font-size: 2.0rem ;
-    }
-    .main-content {
-        margin: 5px;
     }
     .main-content p {
         font-size: 0.8rem;
