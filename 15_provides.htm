@@ -1,0 +1,194 @@
+<section class="chapter 15" id="15_provides">
+    <h2>15# Build Dependency Management with PROVIDES</h2>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/qT3IuaRfjCg?si=DbuN5d0fRn0t6ZzD" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
+    <p> In the Yocto Project, the PROVIDES variable plays a critical role in defining
+        alternative names for recipes. This allows a single recipe to be referenced by multiple names during the build
+        process, enabling flexibility in dependency resolution. It is closely related to the DEPENDS variable and is
+        used for build-time dependencies.</p>
+
+    <h3>What is PROVIDES?</h3>
+    <p>The PROVIDES variable in Yocto defines alternative names or aliases for a recipe. This enables other recipes to
+        depend on it using different names, facilitating features like virtual packages, backward compatibility, and
+        meaningful naming conventions.</p>
+
+    <ul>
+        <li><strong>Alias Support:</strong> Allows a package to be referenced by multiple names (e.g., openssl and
+            libssl).</li>
+        <li><strong>Virtual Packages:</strong> Enables multiple recipes to provide the same functionality (e.g.,
+            different kernel implementations providing virtual/kernel).</li>
+        <li><strong>Backward Compatibility:</strong> Helps when renaming packages without breaking existing
+            dependencies.</li>
+    </ul>
+
+    <h3>How to Use PROVIDES?</h3>
+
+    <p>The PROVIDES variable is defined within a recipe file (.bb) and specifies a space-separated list of
+        alternative names for the recipe. The syntax is as follows:</p>
+    <pre><code>PROVIDES += "alternative-name1 alternative-name2"</code></pre>
+
+    <p>Each name in PROVIDES can then be used in DEPENDS or RDEPENDS elsewhere in the build system.</p>
+
+    <h3>Example 1: Alias for Meaningful Naming</h3>
+
+    <p>In our previous example, we created a calculator recipe that depends on the add recipe, which provides a
+        static library (libmath.a). To make the dependency more meaningful, we can use the PROVIDES variable to
+        define an alias for the add recipe.</p>
+
+    <h4>add.bb</h4>
+    <pre><code>SUMMARY = "Math library for basic arithmetic operations"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://math-lib.c \
+           file://add.c"
+
+S = "${WORKDIR}"
+
+# Define alias for the math library
+PROVIDES = "libmath"
+
+do_compile() {
+    ${CC} ${CFLAGS} -c math-lib.c -o math-lib.o
+#   Creating static library    
+    ar rcs libmath.a math-lib.o 
+    
+    ${CC} ${CFLAGS} -c add.c -o add_inter.o
+    ${CC} ${CFLAGS} ${LDFLAGS} math-lib.o add_inter.o -o add -Wl,--hash-style=gnu
+}
+
+do_install() {
+    install -d ${D}${libdir}
+    install -m 0644 libmath.a ${D}${libdir}
+
+    install -d ${D}${bindir}
+    install -m 0755 add ${D}${bindir}
+}
+
+FILES:${PN} += "${libdir}/libmath.a"</code></pre>
+
+    <h4>calculator.bb</h4>
+    <p>Instead of depending on add, the calculator.bb recipe now depends on libmath, making the dependency
+        clearer:</p>
+    <pre><code>SUMMARY = "Simple calculator application"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+# Depend on the alias provided by add.bb
+DEPENDS = "libmath"
+
+SRC_URI = "file://calculator.c"
+
+S = "${WORKDIR}"
+
+do_compile() {
+    ${CC} ${CFLAGS} ${LDFLAGS} calculator.c -o calculator -L${STAGING_LIBDIR} -lmath -Wl,--hash-style=gnu
+}
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 calculator ${D}${bindir}
+}</code></pre>
+
+    <p>Add the following line to your local.conf file to include the calculator in your image:</p>
+    <pre><code>IMAGE_INSTALL:append = " calculator"</code></pre>
+
+    <p>Build the image as follows:</p>
+    <pre><code>cd /path/to/poky
+source oe-init-build-env
+bitbake core-image-full-cmdline</code></pre>
+
+    <p>The image will build successfully. By using DEPENDS = "libmath" instead of DEPENDS = "add", the dependency
+        becomes more descriptive, clearly indicating that the calculator recipe relies on the libmath library.</p>
+
+    <h3>Example 2: Virtual Package Provider</h3>
+
+    <p>Suppose you have two kernel recipes (linux-yocto and my-custom-kernel), and both can provide the
+        virtual/kernel functionality. You can declare this in their respective recipes using the PROVIDES variable.
+    </p>
+
+    <h4>linux-yocto.bb</h4>
+    <pre><code>PROVIDES += "virtual/kernel"</code></pre>
+
+    <h4>my-custom-kernel.bb</h4>
+    <pre><code>PROVIDES += "virtual/kernel"</code></pre>
+
+    <p>Now, if another recipe depends on virtual/kernel, BitBake can choose either linux-yocto or my-custom-kernel
+        based on configuration settings such as PREFERRED_PROVIDER_virtual/kernel.</p>
+
+
+
+    <h3>Example 3: Backward Compatibility</h3>
+
+    <p>If you rename a recipe from libfoo to libfoo2, you can maintain backward compatibility by adding the old name
+        to PROVIDES:</p>
+
+    <h4>libfoo2.bb</h4>
+    <pre><code>PROVIDES += "libfoo"</code></pre>
+
+    <p>This ensures that any recipe depending on libfoo will still work, as libfoo2 provides it.</p>
+
+
+
+    <h3>Example 4: Multiple Providers for a Tool</h3>
+
+    <p>Suppose you have two recipes (bash and dash) that can both act as a /bin/sh shell provider. You can define
+        them as providers of virtual/sh:</p>
+
+    <h4>bash.bb</h4>
+    <pre><code>PROVIDES += "virtual/sh"</code></pre>
+
+    <h4>dash.bb</h4>
+    <pre><code>PROVIDES += "virtual/sh"</code></pre>
+
+    <p>Now, if another recipe depends on virtual/sh, BitBake can choose between bash and dash based on the
+        PREFERRED_PROVIDER_virtual/sh setting in your configuration files.</p>
+
+    <h3>Key Differences: PROVIDES vs RPROVIDES</h3>
+
+    <p>While both PROVIDES and RPROVIDES allow recipes to provide alternative names, they differ in their scope and
+        usage:</p>
+
+    <table>
+        <tr>
+            <th>Feature</th>
+            <th>PROVIDES</th>
+            <th>RPROVIDES</th>
+        </tr>
+        <tr>
+            <td>Phase</td>
+            <td>Build-time (affects dependency resolution)</td>
+            <td>Runtime (affects package installation)</td>
+        </tr>
+        <tr>
+            <td>Usage</td>
+            <td>Used when other recipes depend on this package during the build process.</td>
+            <td>Used when the package provides a runtime alternative or alias.</td>
+        </tr>
+        <tr>
+            <td>Example</td>
+            <td>PROVIDES = "virtual/kernel" (build choice)</td>
+            <td>RPROVIDES = "sh" (runtime shell provider)</td>
+        </tr>
+    </table>
+
+    <h3>Conclusion</h3>
+
+    <p>PROVIDES is a powerful mechanism in the Yocto Project for enabling flexible dependency resolution. It allows
+        recipes to be referenced by multiple names, supports virtual packages, ensures backward compatibility, and
+        enhances readability by providing meaningful aliases. Use PROVIDES when you want a recipe to be discoverable
+        under different names during the build process.</p>
+
+    <p>In the next video, we will explore advanced dependency management techniques in Yocto. Stay tuned!</p>
+
+    <h3>Reference Links</h3>
+    <ul>
+        <li><a href="https://docs.yoctoproject.org/ref-manual/variables.html#term-PROVIDES" target="_blank">Yocto PROVIDES Variable</a></li>
+    </ul>
+
+</section>>

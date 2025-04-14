@@ -1,8 +1,8 @@
 <section class="chapter 00" id="00_introduction">
     <h2>00# Introduction to Yocto</h2>
     <div class="video-frame">
-        <iframe src="https://www.youtube.com/embed/5fj05BWryhM?si=PiXr17we-uveIdMb"
-            title="YouTube video player" frameborder="0"
+        <iframe src="https://www.youtube.com/embed/5fj05BWryhM?si=PiXr17we-uveIdMb" title="YouTube video player"
+            frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </div>
@@ -68,16 +68,14 @@
     <h4>Installing an Editor</h4>
     <p>We recommend using <strong>VSCode</strong> as the editor for this tutorial. To install VSCode via the
         command line:</p>
-    <pre><code>
-sudo apt update
+    <pre><code>sudo apt update
 sudo apt install snapd
 sudo snap install --classic code
-        </code></pre>
+</code></pre>
 
     <h4>Installing Required Packages</h4>
     <p>Before proceeding, ensure the necessary packages are installed on your host system:</p>
-    <pre><code>
-sudo apt install gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm python3-subunit mesa-common-dev zstd liblz4-tool
+    <pre><code>sudo apt install gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm python3-subunit mesa-common-dev zstd liblz4-tool
 </code></pre>
     <p><em>Reference:</em> <a
             href="https://docs.yoctoproject.org/4.0.7/brief-yoctoprojectqs/index.html#build-host-packages"
@@ -92,16 +90,14 @@ sudo apt install gawk wget git diffstat unzip texinfo gcc build-essential chrpat
 
     <h4>Cloning Poky</h4>
     <p>Create a project folder and clone the Poky repository:</p>
-    <pre><code>
-mkdir yocto_tutorial
+    <pre><code>mkdir yocto_tutorial
 cd yocto_tutorial
 git clone git://git.yoctoproject.org/poky -b kirkstone
 </code></pre>
 
     <h4>Initializing the Build Environment</h4>
     <p>Navigate into the cloned Poky directory and initialize the build environment:</p>
-    <pre><code>
-cd poky
+    <pre><code>cd poky
 source oe-init-build-env
 </code></pre>
     <p>This command places you in the <code>build</code> folder, where the configuration files reside. For
@@ -110,8 +106,7 @@ source oe-init-build-env
     <h4>Creating a Source Folder (Optional but Recommended)</h4>
     <p>From the <code>build</code> folder, create a centralized source folder for organizing your projects:
     </p>
-    <pre><code>
-mkdir ../../sources
+    <pre><code>mkdir ../../sources
 </code></pre>
 
     <h4>Configuring <code>local.conf</code></h4>
@@ -121,8 +116,7 @@ mkdir ../../sources
         <li>Define the source path.</li>
         <li>Add the following settings:</li>
     </ul>
-    <pre><code>
-DL_DIR = "PATH/TO/sources/downloads"
+    <pre><code>DL_DIR = "PATH/TO/sources/downloads"
 SSTATE_DIR = "PATH/TO/sources/sstate_cache"
 TMPDIR = "PATH/TO/sources/tmp"
 MACHINE="beaglebone-yocto"
@@ -133,8 +127,7 @@ INHERIT += "rm_work"
 
     <h4>Building the Image</h4>
     <p>Execute the following command on your terminal to build the image:</p>
-    <pre><code>
-bitbake core-image-full-cmdline
+    <pre><code>bitbake core-image-full-cmdline
 </code></pre>
     <p>This process may take some time, depending on your system’s specifications and internet connection
         speed. On subsequent builds, only the changed components will be rebuilt, significantly reducing
@@ -143,8 +136,7 @@ bitbake core-image-full-cmdline
     <h3>Locating the Image File</h3>
     <p>Once the build is complete, navigate to the <code>tmp</code> folder to locate the generated image
         file:</p>
-    <pre><code>
-cd ../../sources/tmp/deploy/images/beaglebone-yocto
+    <pre><code>cd ../../sources/tmp/deploy/images/beaglebone-yocto
 </code></pre>
     <p>Here, you’ll find the final image file:</p>
     <ul>
