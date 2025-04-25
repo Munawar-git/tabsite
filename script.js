@@ -34,7 +34,9 @@ function loadHTML(file, targetElement) {
         .then(html => {
             document.getElementById(targetElement).innerHTML = html;
         })
-        .catch(error => console.error("Error loading the file:", error));
+        .catch(error => {
+            console.error("Error loading the file:", error);
+        });
 
     closeSidebar();
     scrollToTop();
