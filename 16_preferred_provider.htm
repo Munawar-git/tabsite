@@ -1,0 +1,315 @@
+<section class="chapter 16" id="15_preferred_provider">
+    <h2>16# Package Selection with PREFERRED_PROVIDER</h2>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/JGOtX6ZAwak?si=gc628j1UKYC-5BfH" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    
+    <p>In the Yocto Project, the PREFERRED_PROVIDER variable is used to explicitly select which recipe should be used when multiple recipes provide the same functionality (via PROVIDES). This ensures consistent and unambiguous dependency resolution during the build process. It is closely related to the DEPENDS and PROVIDES variables we learned about in previous tutorials.</p>
+    
+    <h3>What is PREFERRED_PROVIDER?</h3>
+    <p>PREFERRED_PROVIDER is a Yocto variable that resolves ambiguity when multiple recipes declare PROVIDES for the same package or functionality. By defining this variable, you can force BitBake to choose a specific implementation over others.</p>
+    
+    <ul>
+        <li><strong>Used when:</strong> Multiple recipes provide the same functionality via PROVIDES.</li>
+        <li><strong>Defined in:</strong> Configuration files like local.conf, machine files, or distro files.</li>
+        <li><strong>Takes precedence:</strong> Over automatic provider selection by BitBake.</li>
+    </ul>
+    
+    <h3>Why Use PREFERRED_PROVIDER?</h3>
+    <p>Using PREFERRED_PROVIDER helps avoid ambiguous builds, resolve conflicts, optimize your system, and maintain compatibility between different versions of packages. Key benefits include:</p>
+    <ul>
+        <li><strong>Avoids Ambiguity:</strong> Ensures consistent selection between multiple providers.</li>
+        <li><strong>Resolves Conflicts:</strong> Prevents issues when different recipes provide the same package.</li>
+        <li><strong>Optimizes System:</strong> Lets you choose lightweight or feature-rich alternatives based on your needs.</li>
+        <li><strong>Maintains Compatibility:</strong> Helps during transitions between package versions without breaking dependencies.</li>
+    </ul>
+    
+    
+    <h3>How to Use PREFERRED_PROVIDER</h3>
+    
+    <p>The syntax for PREFERRED_PROVIDER is straightforward:</p>
+    <pre><code>PREFERRED_PROVIDER_&lt;package&gt; = "recipe-name"</code></pre>
+    
+    <p>For virtual providers:</p>
+    <pre><code>PREFERRED_PROVIDER_virtual/&lt;feature&gt; = "recipe-name"</code></pre>
+    
+    <p>Define it in configuration files such as:</p>
+    <ul>
+        <li>conf/local.conf (temporary/local overrides)</li>
+        <li>Machine or distro configuration files (persistent settings)</li>
+    </ul>
+    
+    
+    
+    <h3>Example Scenario</h3>
+    
+    <p>In this example, we have three recipes (add.bb, subtract.bb, and calculator.bb) that demonstrate the importance of PREFERRED_PROVIDER:</p>
+    
+    <h4>Recipe 1: add.bb</h4>
+    <p>This recipe provides a static library (libmath.a) with add() functionality.</p>
+    
+    <p><strong>Source Code:</strong></p>
+    
+    <p><strong>add.c:</strong></p>
+    <pre><code>#include &lt;stdio.h&gt;
+    
+extern int add(int a, int b);
+
+int main() {
+    int num1 = 10;
+    int num2 = 5;
+
+    printf("Addition: %d\n", add(num1, num2));
+    return 0;
+}</code></pre>
+    
+    <p><strong>math-lib.c:</strong></p>
+    <pre><code>#include &lt;stdio.h&gt;
+    
+int add(int a, int b) {
+    return a + b;
+}
+
+int subtract(int a, int b) {
+    return a - b;
+}</code></pre>
+    
+    <p><strong>add.bb:</strong></p>
+    <pre><code>SUMMARY = "Math library for basic arithmetic operations"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://math-lib.c \
+           file://add.c"
+
+S = "${WORKDIR}"
+
+PROVIDES = "libmath"
+
+do_compile() {
+    ${CC} ${CFLAGS} -c math-lib.c -o math-lib.o
+#   Creating static library    
+    ar rcs libmath.a math-lib.o 
+    
+    ${CC} ${CFLAGS} -c add.c -o add_inter.o
+    ${CC} ${CFLAGS} ${LDFLAGS} math-lib.o add_inter.o -o add -Wl,--hash-style=gnu
+}
+
+do_install() {
+    install -d ${D}${libdir}
+    install -m 0644 libmath.a ${D}${libdir}
+
+    install -d ${D}${bindir}
+    install -m 0755 add ${D}${bindir}
+}
+
+FILES:${PN} += "${libdir}/libmath.a"</code></pre>
+
+
+
+    <h4>Recipe 2: subtract.bb</h4>
+    <p>This recipe also provides libmath but includes additional multiply() functionality.</p>
+    
+    <p><strong>Source Code:</strong></p>
+    
+    <p><strong>subtract.c:</strong></p>
+    <pre><code>#include &lt;stdio.h&gt;
+    
+extern int subtract(int a, int b);
+
+int main() {
+    int num1 = 10;
+    int num2 = 5;
+
+    printf("Subtraction: %d\n", subtract(num1, num2));
+    return 0;
+}</code></pre>
+    
+    <p><strong>math-lib-2.c:</strong></p>
+    <pre><code>#include &lt;stdio.h&gt;
+    
+int add(int a, int b) {
+    return a + b;
+}
+
+int subtract(int a, int b) {
+    return a - b;
+}
+
+int multiply(int a, int b) {
+    return a * b;
+}</code></pre>
+    
+    <p><strong>subtract.bb:</strong></p>
+    <pre><code>SUMMARY = "Math library for basic arithmetic operations"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://math-lib-2.c \
+           file://subtract.c "
+
+S = "${WORKDIR}"
+
+PROVIDES = "libmath"
+
+do_compile() {
+    ${CC} ${CFLAGS} -c math-lib-2.c -o math-lib-2.o
+    ar rcs libmath.a math-lib-2.o
+
+    ${CC} ${CFLAGS} -c subtract.c -o subtract_inter.o
+    ${CC} ${CFLAGS} ${LDFLAGS} math-lib-2.o subtract_inter.o -o subtract -Wl,--hash-style=gnu
+}
+
+do_install() {
+    install -d ${D}${libdir}
+    install -m 0644 libmath.a ${D}${libdir}
+
+    install -d ${D}${bindir}
+    install -m 0755 subtract ${D}${bindir}
+}
+
+FILES:${PN} += "${libdir}/libmath.a"</code></pre>
+    
+    <h4>Recipe 3: calculator.bb</h4>
+    <p>This recipe depends on libmath for all three functions (add(), subtract(), and multiply()).</p>
+    
+    <p><strong>Source Code:</strong></p>
+    
+    <p><strong>calculator.c:</strong></p>
+    <pre><code>#include &lt;stdio.h&gt;
+    
+extern int add(int a, int b);
+extern int subtract(int a, int b);
+extern int multiply(int a, int b);
+
+int main() {
+    int num1 = 55;
+    int num2 = 9;
+
+    printf("Addition: %d\n", add(num1, num2));
+    printf("Subtraction: %d\n", subtract(num1, num2));
+    printf("Multiplication: %d\n", multiply(num1, num2));
+
+    return 0;
+}</code></pre>
+    
+    <p><strong>calculator.bb:</strong></p>
+    <pre><code>SUMMARY = "Simple calculator application"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+DEPENDS = "libmath"
+
+SRC_URI = "file://calculator.c"
+
+S = "${WORKDIR}"
+
+do_compile() {
+    ${CC} ${CFLAGS} ${LDFLAGS} calculator.c -o calculator -L${STAGING_LIBDIR} -lmath -Wl,--hash-style=gnu
+}
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 calculator ${D}${bindir}
+}</code></pre>
+
+    <h4>The Problem</h4>
+    <p>Both add.bb and subtract.bb provide libmath. Without PREFERRED_PROVIDER, Yocto:</p>
+    <ul>
+        <li>Issues a warning: "Multiple providers available for libmath".</li>
+        <li>Selects the first provider it finds (default: add.bb).</li>
+        <li>Causes a build failure when multiply() is needed because add.bb does not implement it.</li>
+    </ul>
+    
+    <h4>The Solution</h4>
+    <p>To ensure the correct provider is selected, define PREFERRED_PROVIDER in your configuration file:</p>
+    <pre><code># In local.conf
+PREFERRED_PROVIDER_libmath = "subtract"</code></pre>
+    
+    <p>This forces Yocto to:</p>
+    <ul>
+        <li>Always select subtract.bb when libmath is needed.</li>
+        <li>Resolve the multiply() dependency correctly.</li>
+        <li>Eliminate the multiple-provider warning.</li>
+    </ul>
+    
+    <p>After setting this, rebuild the image:</p>
+    <pre><code>cd /path/to/poky
+source oe-init-build-env
+bitbake core-image-full-cmdline</code></pre>
+    
+    <h3>Additional Practical Examples</h3>
+    
+    <h4>Example 1: Kernel Selection</h4>
+    <p>Choose between kernel providers:</p>
+    <pre><code>PREFERRED_PROVIDER_virtual/kernel = "linux-yocto-rt"</code></pre>
+    
+    <h4>Example 2: Shell Implementation</h4>
+    <p>Prefer dash over bash for /bin/sh:</p>
+    <pre><code>PREFERRED_PROVIDER_virtual/sh = "dash"</code></pre>
+    
+    <h4>Example 3: SSL Library Selection</h4>
+    <p>Use LibreSSL instead of OpenSSL:</p>
+    <pre><code>PREFERRED_PROVIDER_openssl = "libressl"
+PREFERRED_PROVIDER_libcrypto = "libressl"</code></pre>
+    
+    <h3>Key Insights from the Video</h3>
+    <ul>
+        <li><strong>Default Behavior:</strong> Without PREFERRED_PROVIDER, Yocto:
+            <ul>
+                <li>Issues warnings about multiple providers.</li>
+                <li>Selects the first provider it finds (often non-optimal).</li>
+            </ul>
+        </li>
+        <li><strong>Error Scenario:</strong> When calculator needed multiply():
+            <ul>
+                <li>Default selection (add.bb) caused an "undefined reference" error.</li>
+                <li>Explicit provider selection fixed the issue.</li>
+            </ul>
+        </li>
+        <li><strong>Verification:</strong> After setting PREFERRED_PROVIDER:
+            <ul>
+                <li>No more multiple-provider warnings.</li>
+                <li>All functionalities worked correctly in QEMU testing (add(), subtract(), and multiply()).</li>
+            </ul>
+        </li>
+    </ul>
+    
+    <h3>Best Practices</h3>
+    <ul>
+        <li><strong>Use Virtual Providers:</strong> Define preferred providers for abstract functionality:
+            <pre><code>PREFERRED_PROVIDER_virtual/kernel = "my-custom-kernel"</code></pre>
+        </li>
+        <li><strong>Set in Appropriate Files:</strong>
+            <ul>
+                <li>Machine-specific: conf/machine/&lt;machine&gt;.conf</li>
+                <li>Global overrides: conf/local.conf</li>
+            </ul>
+        </li>
+        <li><strong>Check Dependencies:</strong> Verify what a recipe provides using:
+            <pre><code>bitbake -e &lt;recipe&gt; | grep ^PROVIDES</code></pre>
+        </li>
+        <li><strong>Combine with PROVIDES:</strong> Ensure your recipes properly declare what they provide:
+            <pre><code>PROVIDES += "virtual/sh libmath"</code></pre>
+        </li>
+    </ul>
+    
+    <h3>Conclusion</h3>
+    <p>The PREFERRED_PROVIDER mechanism is crucial for resolving ambiguous package dependencies, ensuring correct functionality is selected, and maintaining build consistency. As demonstrated in the video, proper use of:</p>
+    <pre><code>PREFERRED_PROVIDER_libmath = "subtract"</code></pre>
+    <p>can prevent cryptic linker errors and guarantee successful builds. This level of control becomes invaluable when:</p>
+    <ul>
+        <li>Maintaining multiple versions of a package.</li>
+        <li>Selecting between optimized implementations.</li>
+        <li>Transitioning between package providers without breaking dependencies.</li>
+    </ul>
+    
+    <p>In the next video, we will explore advanced techniques for managing dependencies in Yocto. Stay tuned!</p>
+    
+    <h4>Reference Links</h4>
+    <ul>
+        <li><a href="https://docs.yoctoproject.org/ref-manual/variables.html#term-PREFERRED_PROVIDER" target="_blank">Yocto PREFERRED_PROVIDER Variable</a></li>
+    </ul>
+    
+</section>
+    
