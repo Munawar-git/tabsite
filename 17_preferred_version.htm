@@ -1,0 +1,302 @@
+<section class="chapter 17" id="17_preferred_provider">
+    <h2>17# Package Version Selection with PREFERRED_VERSION</h2>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/jI2f3lCD4WE?si=vTsZUv6IQjyxesdk" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
+    <p>In this tutorial, we will explore the PREFERRED_VERSION variable in the Yocto Project and learn how it helps
+        select specific versions of recipes when multiple versions exist. This is an essential tool for maintaining
+        consistent builds and ensuring package stability.</p>
+
+    <h3>What is PREFERRED_VERSION?</h3>
+    <p>The PREFERRED_VERSION variable allows you to explicitly specify which version of a recipe should be used during
+        the build process. This is especially useful when there are multiple .bb files for the same package (e.g.,
+        add_1.0.bb and add_1.2.bb).</p>
+
+    <h3>Why Use PREFERRED_VERSION?</h3>
+    <ul>
+        <li><strong>Version Pinning:</strong> Lock specific versions of packages to ensure stability in production
+            systems.</li>
+        <li><strong>Override Defaults:</strong> Force BitBake to use a different version than what it would normally
+            choose.</li>
+        <li><strong>Reproducible Builds:</strong> Keep your builds predictable by preventing unwanted version upgrades.
+        </li>
+        <li><strong>Security Control:</strong> Prevent automatic updates from pulling untested or potentially insecure
+            versions of critical components.</li>
+    </ul>
+
+    <h3>How to Use PREFERRED_VERSION</h3>
+
+    <h4>Basic Syntax</h4>
+    <pre>PREFERRED_VERSION_&lt;recipe-name&gt; = "&lt;version&gt;"</pre>
+
+    <h4>Where to Define It</h4>
+    <ul>
+        <li><code>conf/local.conf</code>: Best for local or temporary overrides.</li>
+        <li>Machine or distro configuration files (e.g., <code>conf/machine/my-machine.conf</code>,
+            <code>conf/distro/include/my-distro.inc</code>): For persistent settings across builds.
+        </li>
+    </ul>
+
+    <h3>Examples</h3>
+
+    <h4>Example 1: Basic Version Selection</h4>
+    <pre># Force version 1.2.3 of openssl
+PREFERRED_VERSION_openssl = "1.2.3"</pre>
+
+    <h4>Example 2: Git-Based Recipe</h4>
+    <p>This example uses the % wildcard to match any patch-level update of a git-based recipe:</p>
+    <pre># For a recipe with PV = "2.1.0+git"
+PREFERRED_VERSION_linux-yocto = "2.1.0+git%"</pre>
+
+    <h4>Example 3: Multiple Version Options</h4>
+    <p>If the preferred version is not available, fall back to another one:</p>
+    <pre># Prefer 5.15 kernel but fall back to 5.10 if unavailable
+PREFERRED_VERSION_linux-yocto ?= "5.15%"
+PREFERRED_VERSION_linux-yocto ?= "5.10%"</pre>
+
+    <h3>Practical Example</h3>
+    <p>We have two versions of the same recipe: add_1.0.bb and add_1.2.bb. Both provide the same functionality
+        (libmath.a) but implement slightly different logic.</p>
+
+    <h4>Folder Structure</h4>
+    <pre>recipes-example/preferred-ver-example/
+├── files
+│   ├── add_1.0.c
+│   ├── add_1.2.c
+│   └── math-lib.c
+├── add_1.0.bb
+└── add_1.2.bb</pre>
+
+    <h4>Recipe: add_1.0.bb</h4>
+    <pre>SUMMARY = "Math library for basic arithmetic operations"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://math-lib.c \
+           file://add_${PV}.c \
+           file://Makefile "
+
+S = "${WORKDIR}"
+
+PROVIDES = "libmath"
+
+do_compile() {
+    ${CC} ${CFLAGS} -c math-lib.c -o math-lib.o
+    ar rcs libmath.a math-lib.o
+
+    ${CC} ${CFLAGS} -c add_${PV}.c -o add_inter.o
+    ${CC} ${CFLAGS} ${LDFLAGS} math-lib.o add_inter.o -o add -Wl,--hash-style=gnu
+}
+
+do_install() {
+    install -d ${D}${libdir}
+    install -m 0644 libmath.a ${D}${libdir}
+
+    install -d ${D}${bindir}
+    install -m 0755 add ${D}${bindir}
+}
+
+FILES:${PN} += "${libdir}/libmath.a"</pre>
+
+    <h4>Source File: add_1.0.c</h4>
+    <pre>#include &lt;stdio.h&gt;
+
+extern int add(int a, int b);
+
+int main() {
+    int num1 = 10;
+    int num2 = 5;
+
+    printf("Addition: %d\n", add(num1, num2));
+    return 0;
+}</pre>
+
+    <h4>Recipe: add_1.2.bb</h4>
+    <pre>SUMMARY = "Math library for basic arithmetic operations"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://math-lib.c \
+           file://add_${PV}.c"
+
+S = "${WORKDIR}"
+
+PROVIDES = "libmath"
+
+do_compile() {
+    ${CC} ${CFLAGS} -c math-lib.c -o math-lib.o
+    ar rcs libmath.a math-lib.o
+
+    ${CC} ${CFLAGS} -c add_${PV}.c -o add_inter.o
+    ${CC} ${CFLAGS} ${LDFLAGS} math-lib.o add_inter.o -o add -Wl,--hash-style=gnu
+}
+
+do_install() {
+    install -d ${D}${libdir}
+    install -m 0644 libmath.a ${D}${libdir}
+
+    install -d ${D}${bindir}
+    install -m 0755 add ${D}${bindir}
+}
+
+FILES:${PN} += "${libdir}/libmath.a"</pre>
+
+    <h4>Source File: add_1.2.c</h4>
+    <pre>#include &lt;stdio.h&gt;
+
+extern int add(int a, int b);
+
+int main() {
+    int num1 = 10;
+    int num2 = 5;
+    int num3 = 7;
+
+    printf("Addition: %d\n", add(add(num1, num2), num3));
+    return 0;
+}</pre>
+
+    <h4>Shared Source Code: math-lib.c</h4>
+    <pre>#include &lt;stdio.h&gt;
+
+int add(int a, int b) {
+    return a + b;
+}
+
+int subtract(int a, int b) {
+    return a - b;
+}</pre>
+
+    <h4>Build Configuration</h4>
+    <p>To control which version gets built, define the following in your local.conf:</p>
+    <pre>IMAGE_INSTALL:append = " add"
+# If no preferred version is defined, BitBake falls back to the most recent one
+PREFERRED_VERSION_add = "1.0"</pre>
+
+    <h4>Build Command</h4>
+    <p>From the terminal, run these commands to start the build:</p>
+    <pre>cd /path/to/poky
+source oe-init-build-env
+bitbake core-image-full-cmdline</pre>
+
+    <p>You can then flash the image to BeagleBone Black or test it using QEMU (<code>runqemu</code>) to see the selected
+        binary in action.</p>
+
+    <h4>Key Points</h4>
+    <div class="keypoint">
+        <ul>
+            <li>Rather than hardcoding exact versions in <code>SRC_URI</code>, we used the <code>${PV}</code> variable
+                to make the recipe scalable across versions.</li>
+            <li>Both recipes share the same logic, but they pick their respective source files based on
+                <code>${PV}</code>.
+            </li>
+            <li>If no <code>PREFERRED_VERSION</code> is defined, BitBake selects the most recent available version.</li>
+        </ul>
+    </div>
+
+    <h3>Key Features</h3>
+
+    <h4>Wildcard Support (%) Character</h4>
+    <p>Use % to match patch-level versions:</p>
+    <pre>PREFERRED_VERSION_python3 = "3.8.%"</pre>
+
+    <h4>Version Comparison</h4>
+    <p>PREFERRED_VERSION helps BitBake decide between:</p>
+    <ul>
+        <li>Different branches in <code>SRC_URI</code></li>
+        <li>Multiple .bb files for the same package</li>
+    </ul>
+
+    <h4>Combined with PROVIDES</h4>
+    <p>You can also use it alongside virtual providers:</p>
+    <pre>PREFERRED_VERSION_virtual/kernel = "5.15%"</pre>
+
+    <h3>Common Use Cases</h3>
+    <ul>
+        <li><strong>Kernel Version Locking:</strong>
+            <pre>PREFERRED_VERSION_linux-yocto = "5.15.72%"</pre>
+        </li>
+        <li><strong>Python Version Control:</strong>
+            <pre>PREFERRED_VERSION_python3 = "3.8.0"</pre>
+        </li>
+        <li><strong>Toolchain Selection:</strong>
+            <pre>PREFERRED_VERSION_gcc = "11.2%"</pre>
+        </li>
+    </ul>
+
+    <h3>Troubleshooting Tips</h3>
+    <ul>
+        <li><strong>Check Available Versions:</strong>
+            <pre>ls meta/recipes-core/&lt;package&gt;/</pre>
+        </li>
+        <li><strong>Verify Selected Version:</strong>
+            <pre>bitbake -e &lt;package&gt; | grep ^PV=</pre>
+        </li>
+        <li><strong>Debug Version Conflicts:</strong>
+            <pre>bitbake-getvar -r &lt;package&gt; PREFERRED_VERSION</pre>
+        </li>
+    </ul>
+
+    <h3>Best Practices</h3>
+    <ul>
+        <li><strong>Use Distro Configs instead of local.conf</strong> for production environments.
+            <pre>PREFERRED_VERSION_linux-yocto = "5.15%"</pre>
+        </li>
+        <li><strong>Combine with SRCREV in git-based recipes</strong>:
+            <pre>SRCREV = "abcdef..."
+PREFERRED_VERSION_&lt;recipe&gt; = "${PV}"</pre>
+        </li>
+        <li><strong>Document Your Version Choices</strong> in README or build documentation to ensure traceability and
+            understanding for future developers.</li>
+    </ul>
+
+    <h3>Comparison with Similar Variables</h3>
+    <table>
+        <tr>
+            <th>Variable</th>
+            <th>Purpose</th>
+            <th>Scope</th>
+        </tr>
+        <tr>
+            <td><code>PREFERRED_VERSION</code></td>
+            <td>Select specific recipe version</td>
+            <td>Build-wide (compile time)</td>
+        </tr>
+        <tr>
+            <td><code>PREFERRED_PROVIDER</code></td>
+            <td>Choose between alternative providers for a common interface (like virtual/sh or virtual/kernel)</td>
+            <td>Build-wide (compile time)</td>
+        </tr>
+    </table>
+
+    <h3>Conclusion</h3>
+    <p>The PREFERRED_VERSION variable gives you precise control over which version of a recipe is included in your Yocto
+        build. By applying this knowledge, you can:</p>
+    <ul>
+        <li>Maintain stable and reproducible builds.</li>
+        <li>Control security updates deliberately.</li>
+        <li>Resolve conflicts between multiple available versions of the same package.</li>
+        <li>Ensure full control over what goes into your embedded Linux system.</li>
+    </ul>
+
+    <p>Here’s an example configuration you can put in your local.conf or distro files:</p>
+    <pre># In conf/local.conf or machine config
+PREFERRED_VERSION_linux-yocto = "5.15%"
+PREFERRED_VERSION_openssl = "3.0.7"
+PREFERRED_VERSION_python3 = "3.8.0"</pre>
+
+    <p>This ensures that your build environment remains under strict version control while still allowing selective
+        flexibility through wildcard support (%).</p>
+
+    <h3>Reference Links</h3>
+    <ul>
+        <li><a href="https://docs.yoctoproject.org/ref-manual/variables.html#term-PREFERRED_VERSION"
+                target="_blank">Yocto PREFERRED_VERSION
+                Variable
+                Documentation</a></li>
+    </ul>
+
+</section>
