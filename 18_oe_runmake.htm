@@ -1,0 +1,200 @@
+<section class="chapter 17" id="18_oe_runmake">
+    <h2>18# Compiling with oe_runmake</h2>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/_7nQHSvqtbI?si=4rbL9lBYxgdq5-Wj" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
+<p>In this tutorial, we'll explore oe_runmake, a powerful helper function in the OpenEmbedded (OE) build system, which is used extensively in the Yocto Project. We'll learn how to use it in recipes, why it's preferred over a direct make call, and how it simplifies cross-compilation and integration with BitBake variables.</p>
+
+<h3>What is oe_runmake?</h3>
+<p>oe_runmake is a <strong>helper function</strong> provided by the OpenEmbedded build system, which is part of the Yocto Project. It is used to run the make command safely and consistently during the build process, especially in cross-compilation environments.</p>
+
+<p>It ensures that the correct compiler and flags are used, and that all environment settings (like parallel builds and logging) are respected by the build system.</p>
+
+<h3>Why Use oe_runmake?</h3>
+<p>While you can use the make command directly in recipes, oe_runmake provides several advantages that make it the preferred choice in Yocto-based builds:</p>
+
+<ul>
+    <li><strong>Cross-Compilation Support:</strong> Uses the correct target compiler and tools, not host system tools.</li>
+    <li><strong>Build Settings Respect:</strong> Honors BitBake variables like EXTRA_OEMAKE, MAKE, and parallel jobs (-j).</li>
+    <li><strong>Integrated Logging:</strong> Integrates with BitBake logs and error reporting for better debugging.</li>
+    <li><strong>Reproducibility:</strong> Ensures consistent builds across different systems and CI environments.</li>
+    <li><strong>Safe Execution:</strong> Prevents accidental use of incorrect tools or environment settings.</li>
+</ul>
+
+<h3>How to Use oe_runmake in Recipes</h3>
+<p>oe_runmake is typically used inside recipe tasks like do_compile and do_install to execute make commands with the correct build environment. It ensures that all Yocto-specific variables are passed to the Makefile automatically.</p>
+
+<h4>Basic Usage in a Recipe</h4>
+<pre class="code-block">do_compile() {
+    oe_runmake
+}</pre>
+
+<p>This runs the default make target (like all) with the correct toolchain and environment settings.</p>
+
+<h4>Running Specific Make Targets</h4>
+<p>You can also pass specific targets to oe_runmake, just like regular make:</p>
+<pre class="code-block">do_compile() {
+    oe_runmake all debug
+}</pre>
+
+<p>This will execute:</p>
+<pre class="code-block">make all debug</pre>
+
+<h3>Practical Example: Building an Advanced Calculator</h3>
+<p>We will build an advanced calculator that uses a custom Makefile and two C source files. We’ll use oe_runmake to compile the code in a Yocto-friendly way.</p>
+
+<h4>Folder Structure</h4>
+<pre class="code-block">recipes-example/oerunmake-example/
+├── adv-calculator.bb
+└── files
+    ├── adv-calculator.c
+    ├── adv-math-lib.c
+    └── Makefile</pre>
+
+<h4>Recipe File: adv-calculator.bb</h4>
+<pre class="code-block">SUMMARY = "Simple calculator application"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://adv-calculator.c \
+           file://adv-math-lib.c \
+           file://Makefile"
+
+S = "${WORKDIR}"
+
+do_compile() {
+    oe_runmake
+}
+
+do_install() {
+    oe_runmake install DESTDIR=${D} BINDIR=${bindir}
+}</pre>
+
+<h4>Makefile</h4>
+<pre class="code-block"># Compiler and flags
+CC := ${CC}
+CFLAGS := ${CFLAGS}
+
+# Source files
+MATH_LIB_SRC = adv-math-lib.c
+CALC_SRC = adv-calculator.c
+
+# Object files
+MATH_LIB_OBJ := adv-math-lib.o
+CALC_OBJ := adv-calculator_inter.o
+
+# Binary output
+TARGET := adv-calculator
+
+all: $(TARGET)
+
+$(TARGET): $(MATH_LIB_OBJ) $(CALC_OBJ)
+    $(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@ -Wl,--hash-style-gnu
+
+$(MATH_LIB_OBJ): $(MATH_LIB_SRC)
+    $(CC) $(CFLAGS) -c $< -o $@
+
+$(CALC_OBJ): $(CALC_SRC)
+    $(CC) $(CFLAGS) -c $< -o $@
+
+install:
+    install -d ${DESTDIR}${BINDIR}
+    install -m 0755 ${TARGET} ${DESTDIR}${BINDIR}
+
+clean:
+    rm -f $(MATH_LIB_OBJ) $(CALC_OBJ) $(TARGET)</pre>
+
+<h4>Source Files</h4>
+
+<h5>adv-math-lib.c</h5>
+<p>This file contains basic arithmetic functions such as add, subtract, and multiply:</p>
+<pre class="code-block">// adv-math-lib.c
+#include &lt;stdio.h&gt;
+
+int add(int a, int b) {
+    return a + b;
+}
+
+int subtract(int a, int b) {
+    return a - b;
+}
+
+int multiply(int a, int b) {
+    return a * b;
+}</pre>
+
+<h5>adv-calculator.c</h5>
+<p>This file uses the math functions and prints the result to the terminal:</p>
+<pre class="code-block">// adv-calculator.c
+#include &lt;stdio.h&gt;
+
+int main() {
+    int num1 = 55;
+    int num2 = 9;
+
+    printf("Addition: %d\n", add(num1, num2));
+    printf("Subtraction: %d\n", subtract(num1, num2));
+    printf("Multiplication: %d\n", multiply(num1, num2));
+
+    return 0;
+}</pre>
+
+<h3>Explanation</h3>
+<p>The recipe builds the adv-calculator program using a Makefile. In the do_compile() function, oe_runmake is used to trigger the make command, which compiles the source files into an executable binary.</p>
+
+<h4>Makefile Integration</h4>
+<p>The Makefile is written to accept environment variables passed from Yocto such as:</p>
+<ul>
+    <li>CC – The cross-compiler provided by Yocto.</li>
+    <li>CFLAGS – Compiler flags from the Yocto environment.</li>
+    <li>LDFLAGS – Linker flags set by Yocto.</li>
+</ul>
+
+<p>By using oe_runmake, we ensure that all these variables are passed correctly without needing to hardcode them in the recipe.</p>
+
+<h4>Install Task</h4>
+<p>The do_install() task uses oe_runmake to run the install target in the Makefile, passing DESTDIR and BINDIR to control where the binary is installed in the final root filesystem:</p>
+<pre class="code-block">do_install() {
+    oe_runmake install DESTDIR=${D} BINDIR=${bindir}
+}</pre>
+
+<p>This is equivalent to running:</p>
+<pre class="code-block">make install DESTDIR=/path/to/rootfs BINDIR=/usr/bin</pre>
+
+<h3>Build Instructions</h3>
+
+<h4>Step 1: Add the Recipe to Your Image</h4>
+<p>Open your local.conf file and add the recipe to the image:</p>
+<pre class="code-block">IMAGE_INSTALL:append = " adv-calculator"</pre>
+
+<h4>Step 2: Build the Image</h4>
+<p>From your terminal, run the following commands:</p>
+<pre class="code-block">cd /path/to/poky
+source oe-init-build-env
+bitbake core-image-full-cmdline</pre>
+
+<h4>Step 3: Test the Image</h4>
+<p>Once the build is complete, flash the image to your BeagleBone Black or test it using QEMU with:</p>
+<pre class="code-block">runqemu</pre>
+
+<p>Then, run the adv-calculator binary on the target system to verify it works as expected.</p>
+
+<h3>Key Points</h3>
+<div class="keypoint">
+    <ul>
+        <li>oe_runmake is a Yocto wrapper for make that ensures safe and consistent builds.</li>
+        <li>Makefiles can directly use Yocto variables like CC, CFLAGS, and LDFLAGS without hardcoding them.</li>
+        <li>Using oe_runmake helps maintain cross-compilation safety and logging integration.</li>
+        <li>Variables like DESTDIR and BINDIR are passed during make install to ensure correct placement in the root filesystem.</li>
+    </ul>
+</div>
+
+<h3>Conclusion</h3>
+<p>oe_runmake is a fundamental helper function in Yocto recipes that enables safe, reproducible, and environment-aware builds. It ensures that the correct compiler, flags, and build settings are used, especially in cross-compilation environments.</p>
+
+<p>By using oe_runmake, you avoid many pitfalls of using the make command directly and gain better integration with the Yocto build system. This makes your recipes more maintainable and your builds more reliable.</p>
+
+<p>In this example, we demonstrated how to use oe_runmake with a custom Makefile and multiple source files, ensuring the build works correctly in a Yocto environment.</p>
+
+</section>

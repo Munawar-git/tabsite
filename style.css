@@ -231,6 +231,13 @@ td:last-of-type {
     font-size: 1.2rem;
 }
 
+.chapter h5 {
+    margin-top: 10px;
+    padding-left: 5px;
+    color: var(--pri-clr);
+    font-size: 1.0rem;
+}
+
 .chapter.about h2 {
     background: none;
     color: var(--pri-clr);
