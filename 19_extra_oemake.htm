@@ -1,0 +1,255 @@
+<section class="chapter 19" id="19_extra_oemake">
+    <h2>19# Customize Build with EXTRA_OEMAKE</h2>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/it1aYiWmTHQ?si=bFjltkrsnwyc4ayj" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
+    <p>In this tutorial, we will explore the EXTRA_OEMAKE variable in the Yocto Project—a
+        powerful tool that allows you to pass custom arguments to the make command during the build process. We’ll
+        learn how it works with oe_runmake, how to use it in recipes, and see a complete example of dynamically
+        configuring a Makefile-based build.</p>
+
+    <h3>What is EXTRA_OEMAKE?</h3>
+    <p>The EXTRA_OEMAKE variable is a BitBake variable used in Yocto recipes to pass additional arguments to the
+        make command when building software that uses a Makefile-based build system.</p>
+
+    <p>It is especially useful when the upstream project does not use Autotools, CMake, or other standard build systems,
+        and you need to influence the build without modifying the original Makefile.</p>
+
+    <h4>Common Use Cases:</h4>
+    <ul>
+        <li>Set build-time options (e.g., DEBUG=1).</li>
+        <li>Override variables defined in the Makefile (e.g., CC=${CC}).</li>
+        <li>Pass target-specific flags or paths (e.g., PREFIX=${prefix}).</li>
+    </ul>
+
+    <h4>Example:</h4>
+    <pre><code>EXTRA_OEMAKE = "DEBUG=1 CC=${CC} CFLAGS=\"${CFLAGS}\""</code></pre>
+    <p>This appends the specified arguments to every oe_runmake call, ensuring the build uses the correct
+        cross-compilation tools and settings.</p>
+
+    <h3>Why Use EXTRA_OEMAKE?</h3>
+    <p>Using EXTRA_OEMAKE gives you fine-grained control over the build process while maintaining compatibility with
+        Yocto’s environment. Key benefits include:</p>
+    <ul>
+        <li><strong>Customize Builds:</strong> Modify behavior without altering the upstream Makefile.</li>
+        <li><strong>Integrate with Yocto:</strong> Use variables like ${CC}, ${CFLAGS}, and ${LDFLAGS} for correct
+            cross-compilation.</li>
+        <li><strong>Avoid Hardcoding:</strong> Keep builds portable and reproducible across different machines and
+            toolchains.</li>
+        <li><strong>Flexible Configuration:</strong> Pass dynamic values like binary names, library lists, or install
+            paths.</li>
+    </ul>
+
+    <h3>How to Use EXTRA_OEMAKE?</h3>
+    <p>You define EXTRA_OEMAKE in your recipe (.bb or .bbappend) to pass extra arguments to oe_runmake. The
+        value is automatically appended when oe_runmake is executed.</p>
+
+    <h4>Basic Syntax:</h4>
+    <pre><code>EXTRA_OEMAKE = "VAR1=value1 VAR2=value2"</code></pre>
+
+    <h4>Appending to Existing Values:</h4>
+    <pre><code>EXTRA_OEMAKE += "DEBUG=1"</code></pre>
+
+    <h4>Using Variable Expansion:</h4>
+    <pre><code>EXTRA_OEMAKE = "PREFIX=${prefix} CC=${CC} CFLAGS=\"${CFLAGS}\" LDFLAGS=\"${LDFLAGS}\""</code></pre>
+
+    <p>Note: If your recipe inherits the make class (inherit make), EXTRA_OEMAKE is used automatically during
+        do_compile.</p>
+
+    <h3>Practical Example: Building a Calculator</h3>
+    <p>In this example, we build a calculator application that uses multiple library files (lib-add.c,
+        lib-subtract.c, lib-multiply.c) and a Makefile. The list of libraries and the output binary name are passed
+        dynamically using EXTRA_OEMAKE.</p>
+
+    <h4>Folder Structure</h4>
+    <pre>
+recipes-example/oerunmake-example/
+├── adv-calculator.bb
+└── files
+    ├── adv-calculator.c
+    ├── lib-add.c
+    ├── lib-subtract.c
+    ├── lib-multiply.c
+    └── Makefile
+</pre>
+
+    <h4>Recipe File: adv-calculator.bb</h4>
+    <pre><code>SUMMARY = "Simple calculator application"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
+SRC_URI = "file://adv-calculator.c \
+           file://lib-add.c \
+           file://lib-subtract.c \
+           file://lib-multiply.c \
+           file://Makefile"
+
+S = "${WORKDIR}"
+
+# Define list of source libraries
+LIBS = "lib-add.c lib-subtract.c lib-multiply.c"
+
+# Pass variables to Makefile via EXTRA_OEMAKE
+EXTRA_OEMAKE:append = " DESTDIR=${D} BINDIR=${bindir}"
+EXTRA_OEMAKE:append = " TARGET=${PN} libs=${LIBS}"
+
+do_compile() {
+    oe_runmake 
+}
+
+do_install() {
+    oe_runmake install 
+}</code></pre>
+
+    <h4>Makefile</h4>
+    <p>The Makefile is designed to accept variables passed from Yocto via EXTRA_OEMAKE. The TARGET and libs are
+        not hardcoded but provided at build time.</p>
+    <pre><code># Compiler and flags
+CC := ${CC}
+CFLAGS := ${CFLAGS}
+
+# Variables from EXTRA_OEMAKE
+TARGET ?= ''
+libs ?= ''
+MAIN_SRC ?= $(TARGET).c
+
+# Source files
+SRCS := $(MAIN_SRC) $(libs)
+
+# Object files
+OBJS := $(SRCS:.c=.o)
+
+# Build target
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+    $(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@ -Wl,--hash-style=gnu
+
+%.o: %.c
+    $(CC) $(CFLAGS) -c $&lt; -o $@
+
+install:
+    install -d ${DESTDIR}${BINDIR}
+    install -m 0755 ${TARGET} ${DESTDIR}${BINDIR}
+
+clean:
+    rm -f $(OBJS) $(TARGET)</code></pre>
+
+    <h4>Source Files</h4>
+
+    <h5>adv-calculator.c</h5>
+    <pre><code>// adv-calculator.c
+#include &lt;stdio.h&gt;
+
+int main() {
+    int num1 = 55;
+    int num2 = 9;
+
+    printf("Addition: %d\n", add(num1, num2));
+    printf("Subtraction: %d\n", subtract(num1, num2));
+    printf("Multiplication: %d\n", multiply(num1, num2));
+
+    return 0;
+}</code></pre>
+
+    <h5>lib-add.c</h5>
+    <pre><code>// lib-add.c
+#include &lt;stdio.h&gt;
+
+int add(int a, int b) {
+    return a + b;
+}</code></pre>
+
+    <h5>lib-subtract.c</h5>
+    <pre><code>// lib-subtract.c
+#include &lt;stdio.h&gt;
+
+int subtract(int a, int b) {
+    return a - b;
+}</code></pre>
+
+    <h5>lib-multiply.c</h5>
+    <pre><code>// lib-multiply.c
+#include &lt;stdio.h&gt;
+
+int multiply(int a, int b) {
+    return a * b;
+}</code></pre>
+
+    <h3>Explanation</h3>
+    <p>The recipe uses EXTRA_OEMAKE to dynamically pass critical build information to the Makefile:</p>
+    <ul>
+        <li><code>TARGET=${PN}</code>: Sets the output binary name to the package name.</li>
+        <li><code>libs=${LIBS}</code>: Tells Makefile which source files to compile.</li>
+        <li><code>DESTDIR=${D}</code> and <code>BINDIR=${bindir}</code>: Used during installation to place the binary in
+            the correct location in the root filesystem.</li>
+    </ul>
+    <p>Since oe_runmake automatically includes EXTRA_OEMAKE, there's no need to manually pass these arguments.</p>
+
+    <h3>Build Instructions</h3>
+
+    <h4>Step 1: Add Recipe to Image</h4>
+    <p>Add the following line to your <code>local.conf</code>:</p>
+    <pre><code>IMAGE_INSTALL:append = " adv-calculator"</code></pre>
+
+    <h4>Step 2: Build the Image</h4>
+    <pre><code>cd /path/to/poky
+source oe-init-build-env
+bitbake core-image-full-cmdline</code></pre>
+
+    <h4>Step 3: Test the Binary</h4>
+    <p>Flash the image to your BeagleBone Black or run it in QEMU (<code>runqemu</code>) and execute:</p>
+    <pre><code>adv-calculator</code></pre>
+    <p>You should see the output of all arithmetic operations.</p>
+
+    <h3>Summary</h3>
+    <table>
+        <tr>
+            <th>Concept</th>
+            <th>Role</th>
+        </tr>
+        <tr>
+            <td><code>EXTRA_OEMAKE</code></td>
+            <td>BitBake variable to pass extra arguments to <code>make</code>.</td>
+        </tr>
+        <tr>
+            <td><code>oe_runmake</code></td>
+            <td>Yocto function that runs <code>make</code> and automatically includes <code>EXTRA_OEMAKE</code>.</td>
+        </tr>
+        <tr>
+            <td><code>Makefile</code></td>
+            <td>Receives and uses variables passed via <code>EXTRA_OEMAKE</code> for dynamic builds.</td>
+        </tr>
+    </table>
+
+    <h3>Best Practices</h3>
+    <div class="keypoint">
+        <ul>
+            <li>Always use Yocto variables like <code>${CC}</code>, <code>${CFLAGS}</code> instead of hardcoded values.
+            </li>
+            <li>Use <code>+=</code> or <code>:append</code> to extend <code>EXTRA_OEMAKE</code> when modifying existing
+                recipes.</li>
+            <li>Prefer <code>inherit make</code> for simple Makefile-based recipes—it automatically handles
+                <code>EXTRA_OEMAKE</code>.</li>
+            <li>Do <strong>not</strong> use <code>EXTRA_OEMAKE</code> for Autotools or CMake projects. Use
+                <code>EXTRA_OECONF</code> or <code>EXTRA_OECMAKE</code> instead.</li>
+        </ul>
+    </div>
+
+    <h3>Conclusion</h3>
+    <p>The <code>EXTRA_OEMAKE</code> variable is a powerful and flexible tool in the Yocto Project for customizing
+        Makefile-based builds. By using it, you can dynamically pass build-time variables such as compiler settings,
+        binary names, and library lists without modifying the original source code.</p>
+
+    <p>Combined with <code>oe_runmake</code>, it ensures safe, reproducible, and cross-compilation-aware builds that
+        integrate seamlessly with the Yocto environment.</p>
+
+    <p>Mastering <code>EXTRA_OEMAKE</code> gives you full control over how your software is compiled and
+        installed—making your recipes more modular, maintainable, and robust.</p>
+
+
+</section>
