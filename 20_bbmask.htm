@@ -1,0 +1,316 @@
+<section class="chapter 20" id="20_bbmask">
+  <h2>20# Hiding Recipe with BBMASK</h2>
+  <div class="video-frame">
+    <iframe
+      src="https://www.youtube.com/embed/K4GY8C3SMf4?si=ylCHTNvtzghUzbuN"
+      title="YouTube video player"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <p>
+    In this tutorial, we explore the BBMASK variable in the Yocto Project — a
+    powerful tool that allows you to selectively hide or exclude recipes,
+    classes, or entire layers from being parsed during the build process. Unlike
+    runtime or build-time controls, BBMASK works at the parsing stage, giving
+    you fine-grained control over which recipes BitBake even considers.
+  </p>
+
+  <h3>What is BBMASK?</h3>
+  <p>
+    The BBMASK variable is a
+    <strong>BitBake configuration directive</strong> that uses
+    <strong>regular expressions (regex)</strong> to
+    <strong>exclude</strong> specific recipe files (.bb) or directories from
+    being parsed during the build process.
+  </p>
+
+  <p>
+    When a file or directory path matches the BBMASK pattern, BitBake completely
+    ignores it — as if the file doesn’t exist. This is not a build-time
+    decision; it happens earlier, during the <strong>parse phase</strong>.
+  </p>
+
+  <div class="note">
+    <p>
+      <strong
+        >Think of BBMASK as a "filter" that prevents BitBake from seeing certain
+        recipes at all.</strong
+      >
+    </p>
+  </div>
+
+  <h4>How It Works</h4>
+  <ul>
+    <li>
+      BBMASK matches against the <strong>full filesystem path</strong> of .bb
+      files and directories.
+    </li>
+    <li>
+      If a path matches, the recipe is <strong>not parsed</strong>, not
+      available for building, and not visible in dependency resolution.
+    </li>
+    <li>
+      It does <strong>not</strong> act on package names (PN) or provides
+      (PROVIDES) — only on file paths.
+    </li>
+  </ul>
+
+  <h4>Example</h4>
+  <pre><code>BBMASK = "meta-example/recipes-graphics"</code></pre>
+  <p>
+    This will ignore all .bb files under any directory matching that path, such
+    as:
+  </p>
+  <pre><code>meta-example/recipes-graphics/mesa/mesa_%.bbappend
+meta-example/recipes-graphics/drm/libdrm_2.4.117.bb</code></pre>
+  <p>These recipes are <strong>invisible</strong> to BitBake.</p>
+
+  <h3>Why Use BBMASK?</h3>
+  <p>
+    BBMASK is a powerful tool for managing complex Yocto projects. Here are the
+    most common reasons to use it:
+  </p>
+
+  <h4>1. Resolve Recipe Conflicts</h4>
+  <p>
+    When multiple layers provide the same recipe (e.g., two busybox versions),
+    BitBake throws an error:
+  </p>
+  <pre
+    class="error"
+  ><code>ERROR: Multiple .bb files are due to be built which each provide virtual/busybox</code></pre>
+  <p>Use BBMASK to hide the unwanted version and resolve the conflict.</p>
+
+  <h4>2. Speed Up Parsing</h4>
+  <p>
+    BitBake parses every .bb file in BBPATH. In large setups (e.g., with
+    meta-openembedded), this can be slow. Masking unused layers (like graphics
+    or multimedia) significantly speeds up:
+  </p>
+  <ul>
+    <li>bitbake -g (dependency graph)</li>
+    <li>bitbake-layers show-recipes</li>
+    <li>Initial parsing time</li>
+  </ul>
+
+  <h4>3. Reduce Build Scope</h4>
+  <p>
+    For minimal or embedded images, you may want to disable entire categories:
+  </p>
+  <ul>
+    <li>GUI applications</li>
+    <li>Python, Rust, Qt5</li>
+    <li>Multimedia frameworks (GStreamer)</li>
+  </ul>
+  <p>BBMASK lets you remove them from consideration entirely.</p>
+
+  <h4>4. Debugging and Testing</h4>
+  <p>
+    Isolate issues by disabling a layer or recipe group. If the build succeeds
+    after masking, you’ve narrowed down the source of the problem.
+  </p>
+
+  <h4>5. Third-Party Layer Management</h4>
+  <p>
+    Some external layers contain recipes you don’t need or that conflict with
+    your setup. BBMASK lets you disable them without removing the layer.
+  </p>
+
+  <h3>How to Use BBMASK?</h3>
+  <p>Set BBMASK in configuration files to control which recipes are hidden.</p>
+
+  <h4>Where to Define It</h4>
+  <ul>
+    <li>
+      <strong>conf/local.conf</strong> (most common — project-specific masking)
+    </li>
+    <li>
+      Machine or distro config files (for persistent masking across builds)
+    </li>
+  </ul>
+
+  <h4>Syntax</h4>
+  <pre><code>BBMASK = "regex-pattern"</code></pre>
+  <p>
+    BitBake applies the regex to the full path of .bb files and directories.
+  </p>
+
+  <h3>Practical Examples</h3>
+
+  <h4>1. Mask All Python Recipes</h4>
+  <pre><code>BBMASK = "meta-openembedded/meta-python"</code></pre>
+  <p>All Python-related recipes are ignored.</p>
+
+  <h4>2. Mask Multiple Layers</h4>
+  <pre><code>BBMASK = "meta-qt5|meta-rust"</code></pre>
+  <p>Hides all recipes in both meta-qt5 and meta-rust layers.</p>
+
+  <h4>3. Mask a Specific Recipe</h4>
+  <pre><code>BBMASK = "my-layer/recipes-core/busybox/busybox_1.30.bb"</code></pre>
+  <p>Only that exact recipe is masked. (Use % for version flexibility.)</p>
+
+  <h4>4. Mask Based on Naming Pattern</h4>
+  <pre><code>BBMASK = "-native"</code></pre>
+  <p>
+    Masks any recipe path containing -native (e.g., gcc-native_%.bb). Use with
+    caution!
+  </p>
+
+  <h3>How to Verify BBMASK is Working?</h3>
+  <p>After setting BBMASK, confirm the recipes are hidden:</p>
+
+  <h4>1. List Available Recipes</h4>
+  <pre><code>bitbake-layers show-recipes</code></pre>
+  <p>The masked recipes should <strong>not appear</strong>.</p>
+
+  <h4>2. Search for a Specific Recipe</h4>
+  <pre><code>bitbake -s | grep "your-recipe"</code></pre>
+  <p>Should return nothing if masked.</p>
+
+  <h4>3. Check Parse Output</h4>
+  <pre><code>bitbake -p</code></pre>
+  <p>You’ll see fewer recipes parsed. Useful for performance testing.</p>
+
+  <h3>Important Notes</h3>
+  <table>
+    <tr>
+      <th>Point</th>
+      <th>Explanation</th>
+    </tr>
+    <tr>
+      <td><strong>Path-Based Matching</strong></td>
+      <td>
+        <code>BBMASK</code> matches file/directory paths — not package names or
+        provides.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Parse-Time Filter</strong></td>
+      <td>
+        It’s applied at parse time — before recipes are loaded. Not a runtime
+        switch.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Can Break Dependencies</strong></td>
+      <td>Masking a recipe that others depend on causes build failures.</td>
+    </tr>
+    <tr>
+      <td><strong>Layer Priority Doesn’t Bypass It</strong></td>
+      <td>
+        Even high-priority layers won’t override <code>BBMASK</code> — masked
+        recipes are not parsed at all.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Improves Performance</strong></td>
+      <td>Fewer recipes = faster parsing. Great for large projects.</td>
+    </tr>
+  </table>
+
+  <h3>Best Practices</h3>
+  <div class="tip">
+    <ul>
+      <li>
+        <strong>Be Specific:</strong> Use precise paths to avoid accidentally
+        masking needed recipes.
+      </li>
+      <li>
+        <strong>Test First:</strong> Use
+        <code>bitbake-layers show-recipes</code> to verify masking.
+      </li>
+      <li>
+        <strong>Document It:</strong> Add comments explaining why a recipe is
+        masked.
+      </li>
+      <li>
+        <strong>Avoid Overly Broad Patterns:</strong> Don’t use
+        <code>BBMASK = "meta-"</code> unless intentional.
+      </li>
+      <li>
+        <strong>Use in <code>local.conf</code>:</strong> Ideal for
+        project-specific exclusions.
+      </li>
+    </ul>
+  </div>
+
+  <h3>Example in conf/local.conf</h3>
+  <pre><code># Disable a specific example recipe to avoid conflicts
+BBMASK = "meta-tab-layer/recipes-example/bbb-example"</code></pre>
+
+  <h4>Build Test</h4>
+  <p>After setting the mask, try to build:</p>
+  <pre><code>cd /path/to/poky
+source oe-init-build-env
+bitbake core-image-full-cmdline</code></pre>
+
+  <p>If bbb-example was masked correctly, you’ll see an error like:</p>
+  <pre class="error"><code>ERROR: Nothing RPROVIDES 'bbb-example'</code></pre>
+  <p>This confirms the recipe was successfully hidden from BitBake.</p>
+
+  <h3>Summary</h3>
+  <table>
+    <tr>
+      <th>Question</th>
+      <th>Answer</th>
+    </tr>
+    <tr>
+      <td><strong>What is BBMASK?</strong></td>
+      <td>A regex-based filter that hides recipes from BitBake parsing.</td>
+    </tr>
+    <tr>
+      <td><strong>Why use it?</strong></td>
+      <td>
+        To resolve conflicts, speed up parsing, disable unwanted layers, or
+        debug builds.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>How to use it?</strong></td>
+      <td>
+        Set in <code>local.conf</code>: <code>BBMASK = "path-or-pattern"</code>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>When does it apply?</strong></td>
+      <td>
+        At <strong>parse time</strong> — before recipes are loaded into the
+        build system.
+      </td>
+    </tr>
+  </table>
+
+  <h3>Conclusion</h3>
+  <p>
+    The BBMASK variable is a powerful and often underused feature in the Yocto
+    Project. It gives you precise control over which recipes BitBake considers,
+    helping you manage complexity, avoid conflicts, and improve build
+    performance.
+  </p>
+
+  <p>
+    Unlike runtime or build-time variables, BBMASK acts at the very beginning of
+    the build process — during parsing — making it ideal for filtering out
+    unwanted or problematic recipes before they cause issues.
+  </p>
+
+  <p>
+    Use it wisely, test thoroughly, and document your decisions. With BBMASK,
+    you can keep your Yocto builds clean, fast, and focused.
+  </p>
+
+  <h3>Reference Links</h3>
+  <ul>
+    <li>
+      <a
+        href="https://docs.yoctoproject.org/ref-manual/variables.html#term-BBMASK"
+        target="_blank"
+        >BBMASK Documentation</a
+      >
+    </li>
+  </ul>
+</section>
