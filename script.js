@@ -67,7 +67,6 @@ document.getElementById('sidebar-toggle').addEventListener('click', function () 
 
     if (sidebar.style.left === '0px') {
         closeSidebar();
-        sidebarToggle.classList.add('animate')
 
     } else {
         // Show the sidebar and adjust the toggle button
