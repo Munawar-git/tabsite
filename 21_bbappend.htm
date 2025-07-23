@@ -1,0 +1,185 @@
+<section class="chapter 21" id="21_bbappend">
+  <h2>21# Modifying Recipes with bbappend file</h2>
+  <div class="video-frame">
+    <iframe src="https://www.youtube.com/embed/IxXSABanxEQ?si=zMhkisBtWJLdeyEk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </div>
+
+<p>In this tutorial, we explore the .bbappend file — a powerful feature in the Yocto Project that allows you to extend or modify an existing recipe without altering the original file. This is essential for maintaining clean, modular, and maintainable builds, especially when working with third-party layers.</p>
+
+<h3>What is a .bbappend File?</h3>
+<p>A .bbappend (pronounced "B-B-append") file is a mechanism in Yocto that lets you customize an existing recipe without modifying the original .bb file. It is used to:</p>
+<ul>
+    <li>Append to or override variables (e.g., SRC_URI, do_configure).</li>
+    <li>Add patches, configuration options, or build steps.</li>
+    <li>Modify installation behavior.</li>
+</ul>
+
+<p>This is especially useful when the original recipe comes from a third-party layer (e.g., meta-openembedded) and you want to avoid direct modifications that could be lost during updates.</p>
+
+<div class="note">
+    <p><strong>Key Idea:</strong> The .bbappend file acts as a "patch" to the original recipe — it extends or overrides parts of it while keeping the base recipe intact.</p>
+</div>
+
+<h3>How .bbappend Works: A Conceptual Diagram</h3>
+<!-- Replace with actual image path if available -->
+<img src="21_bbappend_01.png" alt="bbappend Concept Diagram">
+
+<p><em>Illustration:</em> In this setup:</p>
+<ul>
+    <li><strong>meta-example</strong>: A third-party layer containing the original recipe <code>example.bb</code>.</li>
+    <li><strong>meta-custom</strong>: Your custom layer where you create <code>example.bbappend</code>.</li>
+</ul>
+<p>Yocto automatically combines the original recipe with the .bbappend file during parsing, applying your changes seamlessly.</p>
+
+    <p>The .bbappend filename must match the original .bb filename exactly (e.g., <code>example.bbappend</code> for <code>example.bb</code>).</p>
+    <p>It must be placed in a layer that is included in <code>BBLAYERS</code>.</p>
+
+<h3>Practical Example</h3>
+<p>We’ll demonstrate how to use a .bbappend file to enhance an existing recipe without touching the original.</p>
+
+<h4>Folder Structure</h4>
+<pre>
+recipes-example/
+├── bbb-example/
+│   ├── bbb-example.bb
+│   └── files/
+│       └── 0001-Changed-the-goodbye-message.patch
+└── bbb-example-append/
+    └── bbb-example.bbappend
+</pre>
+
+<p>In this example:</p>
+<ul>
+    <li><code>bbb-example/</code> simulates a third-party recipe.</li>
+    <li><code>bbb-example-append/</code> contains our .bbappend file and additional patches.</li>
+</ul>
+
+<h4>Sources</h4>
+
+<h5>Original Recipe: bbb-example.bb</h5>
+<pre><code>LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+
+SRC_URI = "git://github.com/Munawar-git/bbb-tutorial-code.git;protocol=https;branch=master"
+SRCREV = "f1be90c683cc1fe31f58f3f8b081562e8b5c8230"
+
+SRC_URI:append = " file://0001-Changed-the-goodbye-message.patch"
+
+S = "${WORKDIR}/git"
+
+inherit task-info2
+
+do_configure() {
+    echo "#define WELCOME y" > bbb-example.h
+    echo "#define HELLO y" >> bbb-example.h
+}
+
+do_compile() {
+    ${CC} ${CFLAGS} ${LDFLAGS} ${S}/bbb-example.c -o bbb-example 
+}
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/bbb-example ${D}${bindir}
+}</code></pre>
+
+<h5>Patch: 0001-Changed-the-goodbye-message.patch</h5>
+<pre><code>From 6e9ff4e882dce2e597eecb4694a2448e81432778 Mon Sep 17 00:00:00 2001
+From: ABC &lt;abc@gmail.com&gt;
+Date: Fri, 26 May 2023 15:26:39 +0000
+Subject: [PATCH] Changed the goodbye message
+
+---
+ bbb-example.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/bbb-example.c b/bbb-example.c
+index 6f31000..91538ab 100644
+--- a/bbb-example.c
++++ b/bbb-example.c
+@@ -14,9 +14,9 @@ int main() {
+     #endif
+   #endif
+ 
+-  #ifdef BYE
+-    #if BYE == y
+-      printf("Bye, keep learning!!\n");
++    #ifdef GOODBYE
++    #if GOODBYE == y
++      printf("Good Bye, please come here again!!\n");
+     #endif
+   #endif
+-- 
+2.17.1</code></pre>
+
+<h5>The .bbappend File: bbb-example.bbappend</h5>
+<pre><code>
+do_configure:append() {
+    echo "#define GOODBYE y" >> bbb-example.h
+}</code></pre>
+
+<h4>Build and Explanation</h4>
+
+<h5>Step 1: Initial Build (Without .bbappend)</h5>
+<p>First, we mask the .bbappend file using BBMASK in local.conf:</p>
+<pre><code>BBMASK += "meta-tab-layer/recipes-example/bbb-example-append"
+IMAGE_INSTALL:append = " bbb-example"</code></pre>
+
+<p>Build the image:</p>
+<pre><code>cd /path/to/poky
+source oe-init-build-env
+bitbake core-image-full-cmdline</code></pre>
+
+<p>Run in QEMU:</p>
+<pre><code>runqemu</code></pre>
+
+<p>Execute the binary:</p>
+<pre><code>bbb-example</code></pre>
+
+<p><strong>Output:</strong></p>
+<pre><code>Welcome to Yocto Tutorial.
+Hello there, I am an example code :)</code></pre>
+
+<h5>Step 2: Enable .bbappend and Rebuild</h5>
+<p>Remove or comment out the BBMASK line in local.conf:</p>
+<pre><code># BBMASK += "meta-tab-layer/recipes-example/bbb-example-append"</code></pre>
+
+<p>Rebuild the image:</p>
+<pre><code>bitbake core-image-full-cmdline</code></pre>
+
+<p>Run QEMU again and execute:</p>
+<pre><code>bbb-example</code></pre>
+
+<p><strong>New Output:</strong></p>
+<pre><code>Welcome to Yocto Tutorial
+Hello there, I am an example code :)
+Good Bye, please come here again!!</code></pre>
+
+<h3>What Changed?</h3>
+<ul>
+    <li>It appends to <code>do_configure()</code> to define <code>GOODBYE</code>, enabling the goodbye message in the code.</li>
+    <li>All changes were made <strong>without modifying the original recipe</strong>.</li>
+</ul>
+
+<h3>Best Practices for Using .bbappend</h3>
+<div class="tip">
+    <ul>
+        <li><strong>Use :append and :prepend:</strong> Safely extend variables instead of overwriting them.</li>
+        <li><strong>Keep it Minimal:</strong> Only override what’s necessary.</li>
+        <li><strong>Name Correctly:</strong> Ensure the .bbappend filename matches the original .bb file exactly.</li>
+        <li><strong>Document Changes:</strong> Add comments to explain why changes were made.</li>
+    </ul>
+</div>
+
+<h3>Conclusion</h3>
+<p>The .bbappend file is a cornerstone of clean, maintainable Yocto development. It enables you to:</p>
+<ul>
+    <li>Extend third-party recipes safely.</li>
+    <li>Apply custom patches and configurations.</li>
+    <li>Keep your changes isolated and version-controlled.</li>
+    <li>Avoid conflicts during layer updates.</li>
+</ul>
+
+<p>By mastering .bbappend, you gain the ability to customize complex builds while preserving modularity and clarity — a must-have skill for any Yocto developer.</p>
+
+</section>
