@@ -67,11 +67,14 @@ document.getElementById('sidebar-toggle').addEventListener('click', function () 
 
     if (sidebar.style.left === '0px') {
         closeSidebar();
+        sidebarToggle.classList.add('animate')
+
     } else {
         // Show the sidebar and adjust the toggle button
         sidebar.style.left = '0px';
         sidebarToggle.style.left = '225px';
         sidebarToggle.innerHTML = '&#x00ab;';
+        sidebarToggle.classList.remove('animate')
     }
 });
 

@@ -26,6 +26,7 @@ body {
 hr {
     margin-block: 2rem;
 }
+
 /* Typography & Elements */
 pre {
     margin-block: 5px;
@@ -98,7 +99,8 @@ td:last-of-type {
 .sidebar {
     position: fixed;
     top: 0;
-    left: -250px; /* Initially hidden */
+    left: -250px;
+    /* Initially hidden */
     width: 250px;
     height: 100%;
     padding: 20px;
@@ -170,6 +172,22 @@ td:last-of-type {
     color: var(--main-clr);
 }
 
+.toggle-button.animate {
+    animation: growAndSnapInfinite 1.0s ease-out infinite;
+
+}
+@keyframes growAndSnapInfinite {
+
+    0%,
+    100% {
+        transform: translateY(-50%) scale(1);
+    }
+
+    40% {
+        transform: translateY(-50%) scale(1.1);
+    }
+}
+
 /* Main Content Styling */
 .main-content {
     margin: 50px;
@@ -213,7 +231,7 @@ td:last-of-type {
 
 
 /* Chapter Specific Styles */
-.chapter h2{
+.chapter h2 {
     font-size: 2.3rem !important;
 }
 
@@ -278,113 +296,144 @@ td:last-of-type {
 
 /* Scrollbar styling for Chrome, Edge, and Safari */
 ::-webkit-scrollbar {
-    width: 18px; /* Width of the scrollbar */
+    width: 18px;
+    /* Width of the scrollbar */
     padding: 4px;
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--pri-clr); /* Color of the track */
+    background: var(--pri-clr);
+    /* Color of the track */
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--main-clr); /* Color of the scroll thumb */
-    border-radius: 20px; /* Rounded corners for the thumb */
-    border: 2px solid var(--sec-clr); /* Border around the thumb */
+    background: var(--main-clr);
+    /* Color of the scroll thumb */
+    border-radius: 20px;
+    /* Rounded corners for the thumb */
+    border: 2px solid var(--sec-clr);
+    /* Border around the thumb */
 }
 
 /* Scrollbar styling for Firefox */
 * {
-    scrollbar-width: thin; /* "auto" or "thin" for Firefox */
-    scrollbar-color: var(--main-clr) var(--pri-clr); /* Thumb and track color */
+    scrollbar-width: thin;
+    /* "auto" or "thin" for Firefox */
+    scrollbar-color: var(--main-clr) var(--pri-clr);
+    /* Thumb and track color */
 }
 
 
-@media (max-width: 750px){
+@media (max-width: 750px) {
     table {
         font-size: 0.9rem;
     }
+
     .main-content {
         margin: 30px;
     }
-    .main-content h1{
-        font-size: 3.5rem ;
+
+    .main-content h1 {
+        font-size: 3.5rem;
     }
+
     .main-content h2 {
-        font-size: 3.0rem ;
+        font-size: 3.0rem;
     }
+
     .main-content p {
         font-size: 0.9rem;
     }
-    .chapter h2{
+
+    .chapter h2 {
         font-size: 2.0rem !important;
     }
+
     .chapter h3 {
         font-size: 1.5rem;
     }
+
     .chapter h4 {
         font-size: 1.1rem;
     }
+
     .chapter ul {
         font-size: 0.9rem;
     }
 }
 
 
-@media (max-width: 500px){
+@media (max-width: 500px) {
     table {
         font-size: 0.75rem;
     }
+
     .main-content {
         margin: 20px;
     }
-    .main-content h1{
-        font-size: 2.7rem ;
+
+    .main-content h1 {
+        font-size: 2.7rem;
     }
+
     .main-content h2 {
-        font-size: 2.5rem ;
+        font-size: 2.5rem;
     }
+
     .main-content p {
         font-size: 0.85rem;
     }
-    .chapter h2{
+
+    .chapter h2 {
         font-size: 1.7rem !important;
     }
+
     .chapter h3 {
         font-size: 1.35rem;
     }
+
     .chapter h4 {
         font-size: 1.0rem;
     }
+
     .chapter ul {
         font-size: 0.85rem;
     }
 }
 
-@media (max-width: 450px){
+@media (max-width: 450px) {
     table {
         font-size: 0.6rem;
     }
+
     .main-content {
         margin: 5px;
     }
-    .main-content h1{
-        font-size: 2.2rem ;
+
+    .main-content h1 {
+        font-size: 2.2rem;
     }
+
     .main-content h2 {
-        font-size: 2.0rem ;
+        font-size: 2.0rem;
     }
+
     .main-content p {
         font-size: 0.8rem;
     }
-    .chapter h2{
+
+    .chapter h2 {
         font-size: 1.3rem !important;
     }
+
     .chapter h3 {
         font-size: 1.15rem;
     }
+
     .chapter h4 {
         font-size: 0.95rem;
     }
+
     .chapter ul {
         font-size: 0.8rem;
     }
