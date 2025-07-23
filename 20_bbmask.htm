@@ -160,6 +160,20 @@ meta-example/recipes-graphics/drm/libdrm_2.4.117.bb</code></pre>
     caution!
   </p>
 
+  <h4>5. Example in conf/local.conf</h4>
+  <pre><code># Disable a specific example recipe to avoid conflicts
+BBMASK = "meta-tab-layer/recipes-example/bbb-example"</code></pre>
+
+  <h5>Build Test</h5>
+  <p>After setting the mask, try to build:</p>
+  <pre><code>cd /path/to/poky
+source oe-init-build-env
+bitbake core-image-full-cmdline</code></pre>
+
+  <p>If bbb-example was masked correctly, you’ll see an error like:</p>
+  <pre class="error"><code>ERROR: Nothing RPROVIDES 'bbb-example'</code></pre>
+  <p>This confirms the recipe was successfully hidden from BitBake.</p>
+
   <h3>How to Verify BBMASK is Working?</h3>
   <p>After setting BBMASK, confirm the recipes are hidden:</p>
 
@@ -237,20 +251,6 @@ meta-example/recipes-graphics/drm/libdrm_2.4.117.bb</code></pre>
       </li>
     </ul>
   </div>
-
-  <h3>Example in conf/local.conf</h3>
-  <pre><code># Disable a specific example recipe to avoid conflicts
-BBMASK = "meta-tab-layer/recipes-example/bbb-example"</code></pre>
-
-  <h4>Build Test</h4>
-  <p>After setting the mask, try to build:</p>
-  <pre><code>cd /path/to/poky
-source oe-init-build-env
-bitbake core-image-full-cmdline</code></pre>
-
-  <p>If bbb-example was masked correctly, you’ll see an error like:</p>
-  <pre class="error"><code>ERROR: Nothing RPROVIDES 'bbb-example'</code></pre>
-  <p>This confirms the recipe was successfully hidden from BitBake.</p>
 
   <h3>Summary</h3>
   <table>
