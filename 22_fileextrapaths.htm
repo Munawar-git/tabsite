@@ -1,0 +1,205 @@
+<section class="chapter 22" id="22_fileextrapaths">
+  <h2>22# FILEEXTRAPATHS Varibale in bbappend file</h2>
+  <div class="video-frame">
+    <iframe src="https://www.youtube.com/embed/thOvmzsVbrA?si=A7NJEjdk5Gg13DLp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </div>
+
+
+<p><strong>Summary:</strong> In this chapter, we dive deep into the FILESEXTRAPATHS variable — a critical component in the Yocto Project that enables you to extend the search path for files used in .bbappend recipes. Without it, BitBake won’t find your custom patches or configuration files, leading to build failures. This tutorial explains why it's essential, how it works, and how to use it correctly.</p>
+
+<h3>What is FILESEXTRAPATHS?</h3>
+<p>The <strong><code>FILESEXTRAPATHS</code></strong> variable is used in Yocto to extend the list of directories where BitBake looks for source files, patches, and other resources during the build process. It is most commonly used in <strong><code>.bbappend</code></strong> files to point BitBake to custom files that are not part of the original recipe.</p>
+
+<p>By default, BitBake searches for files in the <code>files/</code> directory of the original recipe. However, when you're using a <code>.bbappend</code> file, any additional files (like patches) must be explicitly referenced using <code>FILESEXTRAPATHS</code>; otherwise, BitBake will not find them.</p>
+
+<div class="note">
+    <p><strong>💡 Key Insight:</strong> If you add a patch in <code>SRC_URI</code> inside a <code>.bbappend</code> but BitBake can't find the file, it’s likely because <code>FILESEXTRAPATHS</code> is missing.</p>
+</div>
+
+<h3>Why is FILESEXTRAPATHS Needed?</h3>
+<p>When you modify or extend a recipe using a <code>.bbappend</code> file, you often need to include additional files such as:</p>
+<ul>
+    <li>Patch files (<code>.patch</code>)</li>
+    <li>Configuration files</li>
+    <li>Scripts or binaries</li>
+</ul>
+
+<h4>Default Behavior</h4>
+<ul>
+    <li>In a standard recipe (<code>recipe.bb</code>), BitBake automatically looks in <code>recipe-name/files/</code> for any <code>file://</code> references.</li>
+    <li>But in a <code>.bbappend</code> file, this behavior does <strong>not</strong> extend automatically to custom folders.</li>
+</ul>
+
+<h4>Problem Without FILESEXTRAPATHS</h4>
+<p>If you try to include a patch like this:</p>
+<pre><code>SRC_URI:append = " file://my-patch.patch"</code></pre>
+<p>…and the file is located in a folder next to your <code>.bbappend</code> file, BitBake will fail with an error:</p>
+<pre><code>ERROR: Unable to find file file://my-patch.patch</code></pre>
+<p>This happens because BitBake doesn’t know where to look — you must tell it using <code>FILESEXTRAPATHS</code>.</p>
+
+<h3>Syntax of FILESEXTRAPATHS</h3>
+<p>To make BitBake aware of your custom file directories, use the following syntax in your <code>.bbappend</code> file:</p>
+<pre><code>FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"</code></pre>
+
+<h4>Explanation of Components</h4>
+<table>
+    <tr>
+        <th>Component</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><code>FILESEXTRAPATHS</code></td>
+        <td>The variable that extends the file search path.</td>
+    </tr>
+    <tr>
+        <td><code>:prepend</code></td>
+        <td>Adds the path to the beginning of the search list (ensures priority).</td>
+    </tr>
+    <tr>
+        <td><code>:=</code></td>
+        <td>Forces immediate variable expansion (critical for correct path resolution).</td>
+    </tr>
+    <tr>
+        <td><code>${THISDIR}</code></td>
+        <td>Points to the directory where the <code>.bbappend</code> file is located.</td>
+    </tr>
+    <tr>
+        <td><code>${PN}</code></td>
+        <td>Package name (e.g., <code>bbb-example</code>), used to name the resource folder.</td>
+    </tr>
+</table>
+
+<p>This line tells BitBake:  
+<strong>"Before searching default locations, also look in the folder named after the recipe inside the same directory as this .bbappend file."</strong></p>
+
+<h3>File Structure</h3>
+<p>By convention, the folder containing your extra files should be named the same as the recipe (i.e., <code>${PN}</code>).</p>
+
+<h4>Example Directory Structure</h4>
+<pre>
+meta-tab-layer/
+└── recipes-example/
+    ├── bbb-example/
+    │   ├── bbb-example.bb
+    │   └── files/
+    │       └── 0001-Changed-the-goodbye-message.patch
+    └── bbb-example-append/
+        ├── bbb-example/                <em><-- Resource folder named after PN</em>
+        │   └── 0001-patch-example.patch
+        └── bbb-example.bbappend        <em><-- .bbappend file</em>
+</pre>
+
+<p>In this layout:</p>
+<ul>
+    <li><code>bbb-example.bbappend</code> uses <code>FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"</code></li>
+    <li>BitBake will now search in <code>bbb-example-append/bbb-example/</code> for any <code>file://</code> references.</li>
+</ul>
+
+<h3>Practical Example</h3>
+
+<h4>1. The .bbappend File</h4>
+<p><strong>File:</strong> <code>bbb-example-append/bbb-example.bbappend</code></p>
+<pre><code>FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
+SRC_URI:append = " file://0001-patch-example.patch"
+
+do_configure:append() {
+    echo "#define GOODBYE y" >> bbb-example.h
+}</code></pre>
+
+<ul>
+    <li><code>FILESEXTRAPATHS</code> adds the <code>bbb-example/</code> folder to the search path.</li>
+    <li><code>SRC_URI:append</code> includes the patch file.</li>
+    <li><code>do_configure:append()</code> adds a macro definition during configuration.</li>
+</ul>
+
+<h4>2. Patch File: <code>0001-patch-example.patch</code></h4>
+<p><strong>Location:</strong> <code>bbb-example-append/bbb-example/0001-patch-example.patch</code></p>
+<pre><code>From e74d69b938aca0e54940b6d058d84b284ae24bc8 Mon Sep 17 00:00:00 2001
+From: ABC <abc@gmail.com>
+Date: Fri, 5 May 2023 19:04:31 +0200
+Subject: [PATCH] patch example
+
+---
+ bbb-example.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/bbb-example.c b/bbb-example.c
+index 6f31000..d925dda 100644
+--- a/bbb-example.c
++++ b/bbb-example.c
+@@ -4,7 +4,7 @@
+ int main() {
+   #ifdef WELCOME
+     #if WELCOME == y
+-      printf("Welcome to Yocto Tutorial.\n");
++      printf("Welcome to Yocto Tutorial\n");
+     #endif
+   #endif
+ 
+@@ -20,5 +20,8 @@ int main() {
+     #endif
+   #endif
+
++  printf("Hurry!! Patched successfully\n");
++
++
+   return 0;
+ }
+-- 
+2.17.1</code></pre>
+
+<p>This patch:</p>
+<ul>
+    <li>Adds a success message: <code>"Hurry!! Patched successfully"</code>.</li>
+</ul>
+
+<h3>Verifying FILESEXTRAPATHS</h3>
+<p>You can confirm that BitBake recognizes your extra paths by inspecting the environment:</p>
+<pre><code>bitbake -e bbb-example | grep "FILESEXTRAPATHS="</code></pre>
+<p>The output should include your custom path:</p>
+<pre><code>FILESEXTRAPATHS="/path/to/meta-tab-layer/recipes-example/bbb-example-append/bbb-example:"</code></pre>
+
+<h3>Build and Test</h3>
+
+<h4>Step 1: Add to Image</h4>
+<p>Add the package to your image via <code>local.conf</code>:</p>
+<pre><code>IMAGE_INSTALL:append = " bbb-example"</code></pre>
+
+<h4>Step 2: Build the Image</h4>
+<pre><code>cd /path/to/poky
+source oe-init-build-env
+bitbake core-image-full-cmdline</code></pre>
+
+<h4>Step 3: Run and Test</h4>
+<p>Launch the image in QEMU:</p>
+<pre><code>runqemu</code></pre>
+<p>Run the binary:</p>
+<pre><code>root@beaglebone-yocto:~# bbb-example</code></pre>
+
+<h4>Expected Output</h4>
+<pre><code>root@beaglebone-yocto:~# bbb-example
+Welcome to Yocto Tutorial
+Hello there, I am an example code :)
+Good Bye, please come here again!!
+Hurry!! Patched successfully</code></pre>
+
+<p>The fourth line — <code>"Hurry!! Patched successfully"</code> — comes from the patch added via the <code>.bbappend</code> file, proving that <code>FILESEXTRAPATHS</code> worked correctly.</p>
+
+<h3>Best Practices</h3>
+<div class="tip">
+    <ul>
+        <li><strong>Always use <code>:prepend :=</code></strong> to ensure correct path expansion and priority.</li>
+        <li><strong>Name your resource folder <code>${PN}</code></strong> to follow Yocto conventions.</li>
+        <li><strong>Use relative paths only</strong> — avoid hardcoding absolute paths.</li>
+        <li><strong>Test with <code>bitbake -e</code></strong> to verify paths are resolved correctly.</li>
+        <li><strong>Document your patches</strong> with meaningful names and commit messages.</li>
+    </ul>
+</div>
+
+<h3>Conclusion</h3>
+<p>The <code>FILESEXTRAPATHS</code> variable is essential for any Yocto developer working with <code>.bbappend</code> files. It bridges the gap between your custom modifications and the build system’s file resolution logic.</p>
+
+<p>Without it, even a perfectly written patch will fail to apply simply because BitBake can’t find it. With it, you gain full control over where your resources are stored, enabling clean, modular, and maintainable recipe extensions.</p>
+
+</section>
